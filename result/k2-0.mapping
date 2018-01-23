@@ -1,0 +1,23 @@
+Number of players: 2
+Number of actions: 
+Player 1 : 4
+Player 2 : 4
+
+ 
+Number of clusters: 
+Player 1 : 2
+Player 2 : 2
+
+ 
+Mapping of actions: 
+
+Player 1 : 
+Cluster 1 Actions: 1, 2, 
+Cluster 2 Actions: 3, 4, 
+
+ 
+Player 2 : 
+Cluster 1 Actions: 3, 
+Cluster 2 Actions: 1, 2, 4, 
+
+ 

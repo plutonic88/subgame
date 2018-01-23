@@ -13,9 +13,9 @@ import Log.Logger;
 /*import ega.generate.Generate;*/
 import games.DeviationIterator;
 import generate.Generate;
-import subgame.GameReductionBySubGame;
 import subgame.Parameters;
 import subgame.StrategyMap;
+import subnet.SubNet;
 import util.GamutModifier;
 
 
@@ -714,13 +714,16 @@ public class Main {
 			
 			//GameReductionBySubGame.deltaExperiment();
 			//GameReductionBySubGame.LouvainVsKmean();
-			GameReductionBySubGame.testSubGameSolverV3();
+			//GameReductionBySubGame.testSubGameSolverV3();
+			//GameReductionBySubGame.testCyberSubGame();
 			//GameReductionBySubGame.clusterDistributionExperiment();
 			//ClusteringForSubgame.testSubgameClustering();
 			//SecurityGameAbstraction.wildlifeAbstraction();
 			//SecurityGameAbstraction.testing1();
 			//SecurityGameAbstraction.testingMMR();
 			//LouvainClusteringActions.testLouvainClustering();
+			SubNet.doExp();
+			
 			
 			
 		} 

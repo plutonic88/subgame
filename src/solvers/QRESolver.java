@@ -618,6 +618,7 @@ public class QRESolver implements GameSolver, GameOutcomePredictor {
       cmd.add(String.valueOf(initialStepSize));
       cmd.add("-a");
       cmd.add(String.valueOf(maxAcceleration));
+    // cmd.add("-S");
       cmd.add("-l");
       cmd.add(String.valueOf(lambda));
       try {
