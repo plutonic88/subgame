@@ -2902,9 +2902,9 @@ public class GameReductionBySubGame {
 		 * first test games are built
 		 */
 		int numberofplayers = 2;
-		int numberofcluster = 10;
+		int numberofcluster = 3;
 		int limit_comsize=10;
-		int numberofaction = 100;
+		int numberofaction = 9;
 		double delta = 0;
 		double margin = 1; // margin to include best responses for the graph for louvain method
 		int totalgames = 1;//3
@@ -2922,7 +2922,7 @@ public class GameReductionBySubGame {
 				dummypartition[i][j] = new ArrayList<Integer>(); 
 			}
 		}
-		createRandomPartition(numberofcluster, numberofaction, dummypartition);
+		createPartition(numberofcluster, numberofaction, dummypartition);
 		/*
 		 * create a predefined partition
 		 */
@@ -2934,13 +2934,13 @@ public class GameReductionBySubGame {
 			{
 				dummypartition[i][0].add(1);
 				dummypartition[i][0].add(2);
-				//dummypartition[i][0].add(7);
-				dummypartition[i][1].add(3);
+				dummypartition[i][0].add(3);
 				dummypartition[i][1].add(4);
-				//dummypartition[i][1].add(9);
-				dummypartition[i][2].add(5);
-				dummypartition[i][2].add(6);
-				//dummypartition[i][2].add(8);
+				dummypartition[i][1].add(5);
+				dummypartition[i][1].add(6);
+				dummypartition[i][2].add(7);
+				dummypartition[i][2].add(8);
+				dummypartition[i][2].add(9);
 
 
 
@@ -2949,13 +2949,13 @@ public class GameReductionBySubGame {
 			{
 				dummypartition[i][0].add(1);
 				dummypartition[i][0].add(2);
-				//dummypartition[i][0].add(9);
-				dummypartition[i][1].add(3);
+				dummypartition[i][0].add(3);
 				dummypartition[i][1].add(4);
-				//dummypartition[i][1].add(8);
-				dummypartition[i][2].add(5);
-				dummypartition[i][2].add(6);
-				//dummypartition[i][2].add(7);
+				dummypartition[i][1].add(5);
+				dummypartition[i][1].add(6);
+				dummypartition[i][2].add(7);
+				dummypartition[i][2].add(8);
+				dummypartition[i][2].add(9);
 			}
 
 		}*/
@@ -3006,6 +3006,7 @@ public class GameReductionBySubGame {
 			 */
 
 			makeDeepCopyPartition(allparitions.get(gamenumber), GameReductionBySubGame.partition);
+			//makeDeepCopyPartition(dummypartition, GameReductionBySubGame.partition);
 			//System.out.println("doing louvain, game "+ gamenumber + "...");
 			System.out.println("NUmber of subgames "+ GameReductionBySubGame.numberofsubgames);
 			Date start = new Date();
@@ -3491,15 +3492,15 @@ public class GameReductionBySubGame {
 				allparitions.add(randpart);
 				//f=1;
 			}
-			MatrixGame testgm = GameReductionBySubGame.makeTestGame(i, size, delta);
-			double[] delta1 = calculateDelta(testgm, dummypartition, 0, true);
-			double[] delta2 = calculateDelta(testgm, dummypartition, 1, true);
-			System.out.println("Deltas: "+ delta1[0]+" "+delta2[0]);
-			if(delta1[0]>delta || delta2[0]>delta)
+			//MatrixGame testgm = GameReductionBySubGame.makeTestGame(i, size, delta);
+			//double[] delta1 = calculateDelta(testgm, dummypartition, 0, true);
+			//double[] delta2 = calculateDelta(testgm, dummypartition, 1, true);
+			//System.out.println("Deltas: "+ delta1[0]+" "+delta2[0]);
+			/*if(delta1[0]>delta || delta2[0]>delta)
 			{
 				throw new Exception("Delta exceeds...");
 				//System.out.print();
-			}
+			}*/
 			List<Integer>[][] randpartition = new List[numberofplayers][];
 			for(int j=0; j< randpartition.length; j++)
 			{
@@ -3512,7 +3513,7 @@ public class GameReductionBySubGame {
 					randpartition[j][k] = new ArrayList<Integer>(); 
 				}
 			}
-			createRandomPartition(numberofcluster, numberofaction, randpartition);
+			createPartition(numberofcluster, numberofaction, randpartition);
 			if(f==1)
 			{
 				List<Integer>[][] randpart = new List[numberofplayers][];
@@ -4481,6 +4482,36 @@ public class GameReductionBySubGame {
 						}
 					}
 				}
+			}
+		}
+
+
+	}
+	
+	
+	private static void createPartition(int numberofcluster,
+			int numberofaction, List<Integer>[][] partition) {
+
+		int actionpercluster = numberofaction/ numberofcluster;
+
+		ArrayList<Integer> alreadydone = new ArrayList<Integer>();
+
+
+		for(int i =0; i< 2; i++)
+		{
+			//alreadydone.clear();
+			int x = 1;
+			for(int j=0; j<numberofcluster; j++)
+			{
+				int count = 0;
+				while(count<3)
+				{
+							partition[i][j].add(x);
+							x++;
+							count++;
+				}
+						
+				
 			}
 		}
 

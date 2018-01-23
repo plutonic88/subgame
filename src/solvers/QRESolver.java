@@ -2,13 +2,10 @@ package solvers;
 
 
 
-import static subgame.Parameters.GAMBIT_LOGIT_PATH;
-
-
 import static subgame.EGAUtils.getSB;
 import static subgame.EGAUtils.nf;
 import static subgame.EGAUtils.returnSB;
-
+import static subgame.Parameters.GAMBIT_LOGIT_PATH;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

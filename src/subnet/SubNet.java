@@ -1,9 +1,14 @@
 package subnet;
 
+import java.io.PrintWriter;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.Random;
+
+import games.MatrixGame;
+import output.SimpleOutput;
+import subgame.Parameters;
 
 
 
@@ -12,19 +17,68 @@ public class SubNet {
 	public static void doExp() {
 		
 		
+		int[] naction = {9,9};
 		HashMap<Integer, Node> nodes = createNetwork();
 		printNodes(nodes);
-		doMonteCarloSimulation(nodes);
+		HashMap<String, Double> attackerpayoffs = new  HashMap<String, Double>();
+		HashMap<String, Double> defenderpayoffs = new  HashMap<String, Double>();
+		doMonteCarloSimulation(nodes, defenderpayoffs, attackerpayoffs);
+		buildGameFile(naction, defenderpayoffs, attackerpayoffs, 9);
 		
 		
 	}
 
-	private static void doMonteCarloSimulation(HashMap<Integer, Node> nodes) {
+	private static void buildGameFile(int[] naction, HashMap<String, Double> defenderpayoffs,
+			HashMap<String, Double> attackerpayoffs, int gamenumber) {
+		
+		
+		MatrixGame game = new MatrixGame(2, naction);
+		
+		
+		
+		for(int i=0; i<naction[0]; i++)
+		{
+			for(int j=0; j<naction[1]; j++)
+			{
+				String key = (i) +","+(j);
+				double defval = defenderpayoffs.get(key);
+				double attval = attackerpayoffs.get(key);
+				int[] outcome = {i+1, j+1};
+				
+				double payoffs[] = {defval, attval};
+				
+				game.setPayoffs(outcome, payoffs);
+				
+			}
+		}
+		
+		
+		String gamename = Parameters.GAME_FILES_PATH+gamenumber+Parameters.GAMUT_GAME_EXTENSION;
+
+		//	String gamename = Parameters.GAME_FILES_PATH+gamenumber+"-"+size+"-"+delta+Parameters.GAMUT_GAME_EXTENSION;
+		//String gmname = "k"+this.numberofclusters[0]+"-"+this.gamename;
+
+		try{
+
+			PrintWriter pw = new PrintWriter(gamename,"UTF-8");
+			SimpleOutput.writeGame(pw,game);
+			pw.close();
+		}
+		catch(Exception ex){
+			System.out.println("StrategyMapping class :something went terribly wrong during clustering abstraction ");
+		}
+		
+		
+		
+	}
+
+	private static void doMonteCarloSimulation(HashMap<Integer, Node> nodes, HashMap<String,Double> defenderpayoffs, HashMap<String,Double> attackerpayoffs) {
 		
 		
 		int LIMIT = 100000;
 		
-		HashMap<String, Double> attackerpayoffs = new  HashMap<String, Double>();
+		/*HashMap<String, Double> attackerpayoffs = new  HashMap<String, Double>();
+		HashMap<String, Double> defenderpayoffs = new  HashMap<String, Double>();*/
 		
 		
 		for(Node hardendenode : nodes.values())
@@ -35,20 +89,29 @@ public class SubNet {
 				// harden the defended node
 				
 				double attackerpoints = 0.0;
-				
-				
+				double defenderpoints = 0.0;
 				
 				for(int iter = 0; iter<=LIMIT; iter++)
 				{
+					if(hardendenode.id==attackednode.id)
+					{
+						defenderpoints += (0.0 - hardendenode.defcost);
+					}
+					else
+					{
+						defenderpoints += -(hardendenode.value + hardendenode.defcost);
+					}
+			
 					
 					//System.out.println("("+hardendenode.id + ","+ attackednode.id+ ") , iter  " + iter);
 					
 					
 					Node start = new Node(attackednode);
 					
-					PriorityQueue<Node> fringequeue = new PriorityQueue<Node>(1000, new Comparator<Node>() {  
-					    
-			            public int compare(Node w1, Node w2) {                         
+					PriorityQueue<Node> fringequeue = new PriorityQueue<Node>(1000, new Comparator<Node>() 
+					{  
+					    public int compare(Node w1, Node w2) 
+			            {                         
 			                return (int)(w1.depth - w2.depth);
 			            }      
 			        }); 
@@ -99,12 +162,14 @@ public class SubNet {
 				}
 				
 				attackerpoints /= LIMIT;
+				defenderpoints /= LIMIT;
 				
 				System.out.println("("+hardendenode.id + ","+ attackednode.id+ ") = " + attackerpoints);
 				
 				String key = hardendenode.id + ","+attackednode.id;
 				
 				attackerpayoffs.put(key, attackerpoints);
+				defenderpayoffs.put(key, defenderpoints);
 				
 
 			}
@@ -140,9 +205,9 @@ public class SubNet {
 		HashMap<Integer, Node> nodes = new HashMap<Integer, Node>();
 		
 		
-		Node a = new Node(0, 0, 10, false);
-		Node b = new Node(1, 0, 4, false);
-		Node c = new Node(2, 0, 6, false);
+		Node a = new Node(0, 0, 10, false, 4);
+		Node b = new Node(1, 0, 4, false, 1);
+		Node c = new Node(2, 0, 6, false, 2);
 		
 		a.addNeighbor(b);
 		a.setTransitionProbs(b, 0.4);
@@ -168,9 +233,9 @@ public class SubNet {
 		
 		
 		
-		Node d = new Node(3, 1, 7, false);
-		Node e = new Node(4, 1, 8, false);
-		Node f = new Node(5, 1, 9, false);
+		Node d = new Node(3, 1, 7, false, 2);
+		Node e = new Node(4, 1, 8, false, 3);
+		Node f = new Node(5, 1, 9, false, 3);
 		
 		d.addNeighbor(e);
 		d.setTransitionProbs(e, 0.5);
@@ -196,9 +261,9 @@ public class SubNet {
 		
 		
 		
-		Node g = new Node(6, 2, 5, false);
-		Node h = new Node(7, 2, 9, false);
-		Node i = new Node(8, 2, 6, false);
+		Node g = new Node(6, 2, 5, false, 1);
+		Node h = new Node(7, 2, 9, false, 3);
+		Node i = new Node(8, 2, 6, false, 2);
 		
 		
 		
@@ -269,6 +334,7 @@ class Node {
 	int id;  // unique across the network
 	int subnetid;
 	int value;
+	int defcost;
 	boolean hardended= false;
 	
 	int depth = 0;
@@ -279,12 +345,13 @@ class Node {
 	
 	
 	
-	public Node(int id, int subnetid, int value, boolean hardended) {
+	public Node(int id, int subnetid, int value, boolean hardended, int defcost) {
 		super();
 		this.id = id;
 		this.subnetid = subnetid;
 		this.value = value;
 		this.hardended = hardended;
+		this.defcost = defcost;
 	}
 	
 	public Node(Node node)
@@ -293,6 +360,7 @@ class Node {
 		this.subnetid = node.subnetid;
 		this.value = node.value;
 		this.hardended = node.hardended;
+		this.defcost = node.defcost;
 		
 		for(Node nei: node.getNeighbors().values())
 		{

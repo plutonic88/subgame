@@ -4,11 +4,10 @@ package solvers;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import Log.Logger;
 import games.Game;
 import games.MixedStrategy;
 import games.OutcomeIterator;
-
-import Log.Logger;
 
 
 public class MinEpsilonBoundSolver {
