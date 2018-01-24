@@ -3976,7 +3976,7 @@ public class GameReductionBySubGame {
 	{
 
 		int[] N = tstgame.getNumActions();
-		PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+gamenumber+".txt"),true));
+		PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+gamenumber+".csv"),true));
 
 		for(int i=0; i<N [0];i++)
 		{
@@ -3990,7 +3990,7 @@ public class GameReductionBySubGame {
 				String p1 = df.format(tstgame.getPayoff(outcome, 0));
 				String p2 = df.format(tstgame.getPayoff(outcome, 1));
 
-				pw.append("("+p1 + ", "+p2+")  ");
+				pw.append(p1 + " | "+p2+ "," );
 				System.out.print("("+p1 + ", "+p2+")  ");
 			}
 			pw.append("\n");

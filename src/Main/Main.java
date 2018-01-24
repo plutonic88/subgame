@@ -716,14 +716,14 @@ public class Main {
 			//GameReductionBySubGame.deltaExperiment();
 			//GameReductionBySubGame.LouvainVsKmean();
 			//GameReductionBySubGame.testSubGameSolverV3();
-			GameReductionBySubGame.testCyberSubGame();
+			//GameReductionBySubGame.testCyberSubGame();
 			//GameReductionBySubGame.clusterDistributionExperiment();
 			//ClusteringForSubgame.testSubgameClustering();
 			//SecurityGameAbstraction.wildlifeAbstraction();
 			//SecurityGameAbstraction.testing1();
 			//SecurityGameAbstraction.testingMMR();
 			//LouvainClusteringActions.testLouvainClustering();
-			//SubNet.doExp();
+			SubNet.doExp();
 			
 			
 			
