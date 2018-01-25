@@ -12,6 +12,7 @@ import java.util.Random;
 
 import games.MatrixGame;
 import output.SimpleOutput;
+import subgame.GameReductionBySubGame;
 import subgame.Parameters;
 
 
@@ -890,28 +891,37 @@ public class SubNet {
 
 
 
-	public static void transmissionExp() throws FileNotFoundException {
+	public static void transmissionExp() throws Exception {
 
 
+		int ITER_LIMIT = 5;
+		int naction = 15;
+		int nplayer = 2;
+		int ncluster = 3;
 		// set up the game parameters before experiments
-		buildExperimentGames(5);
+		//buildExperimentGames(ITER_LIMIT, naction, nplayer, ncluster);
 
 		// do the exp
+		
+		GameReductionBySubGame.transmissionExp(ITER_LIMIT, naction, nplayer, ncluster);
 
 
 	}
 	
 	
-	public static void buildExperimentGames(int ITER_LIMIT) throws FileNotFoundException
+	
+
+
+	public static void buildExperimentGames(int ITER_LIMIT, int naction2, int nplayer, int ncluster) throws FileNotFoundException
 	{
 		// create game files
 
 				//int ITER_LIMIT = 5;
-				int[] naction = {15,15};
+				int[] naction = {naction2,naction2};
 
 				// number of subnet
-				int nsubnet = 3;
-				int numberofnodes = 15;
+				int nsubnet = ncluster;
+				int numberofnodes = naction2;
 				int nodesinsubnet[] = {numberofnodes/nsubnet, numberofnodes/nsubnet, numberofnodes/nsubnet/*, 
 						numberofnodes/nsubnet, numberofnodes/nsubnet*//*,
 						numberofnodes/nsubnet, numberofnodes/nsubnet, numberofnodes/nsubnet, numberofnodes/nsubnet, numberofnodes/nsubnet*/};
