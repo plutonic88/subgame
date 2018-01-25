@@ -2904,7 +2904,7 @@ public class GameReductionBySubGame {
 		int numberofplayers = 2;
 		int numberofcluster = 3;
 		int limit_comsize=10;
-		int numberofaction = 9;
+		int numberofaction = 15;
 		double delta = 0;
 		double margin = 1; // margin to include best responses for the graph for louvain method
 		int totalgames = 1;//3
