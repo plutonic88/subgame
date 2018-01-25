@@ -1,9 +1,10 @@
 package subnetmarcus;
 
+
+
+
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
@@ -95,7 +96,7 @@ public class Subnetwork {
 	public static double[] attackerCosts = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 	public static double[] defenderCosts = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 	
-	public static double simulate(ArrayList<Node> nodes, ArrayList<ArrayList<Edge>> edges, int startNode){
+	public static boolean[] simulate(ArrayList<Node> nodes, ArrayList<ArrayList<Edge>> edges, int startNode, int defMove){
 		double totalValue = nodes.get(startNode).value;
 		//System.out.println("Starting value: " + totalValue);
 		//System.out.println();
@@ -107,7 +108,7 @@ public class Subnetwork {
 		}
 		
 		Random r = new Random();
-		while(!queue.isEmpty()){
+		while(!queue.isEmpty() && controlled[defMove]==false){
 			Edge e = queue.poll();
 			if(controlled[e.v2] == false){
 				double chance = r.nextDouble();
@@ -131,12 +132,12 @@ public class Subnetwork {
 			}
 		}
 		
-		return totalValue;
+		return controlled;
 	}
 	
-	public static void main(String[] args){
-		Subnetwork sub = new Subnetwork();
-		sub.simulate(sub.nodes, sub.edges, 0);
-	}
+	/*public static void main(String[] args){
+		Simulator sub = new Simulator();
+		sub.simulate();
+	}*/
 	
 }

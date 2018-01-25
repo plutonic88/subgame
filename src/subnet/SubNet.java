@@ -26,39 +26,351 @@ public class SubNet {
 		// number of subnet
 		int nsubnet = 3;
 		int numberofnodes = 9;
-		int nodesinsubnet[] = {numberofnodes/nsubnet, numberofnodes/nsubnet, numberofnodes/nsubnet};
-		int intrasubtransmissionprob[] = {60, 100};
+		int nodesinsubnet[] = {numberofnodes/nsubnet, numberofnodes/nsubnet, numberofnodes/nsubnet/*, 
+				numberofnodes/nsubnet, numberofnodes/nsubnet*//*,
+				numberofnodes/nsubnet, numberofnodes/nsubnet, numberofnodes/nsubnet, numberofnodes/nsubnet, numberofnodes/nsubnet*/};
+		int intrasubtransmissionprob[] = {80, 90}; //make this 2d
 		double intrasubtransmissionprobnoise = 0;
-		int intersubtransmissionprob[] = {10, 20};
+		int intersubtransmissionprob[] = {10, 20}; // make this 2d/3d
 		double intersubtransmissionprobnoise = 0;
-		int[] nodevaluerange = {5, 10};
-		int[] defcostrange = {2,3};
-		int[] attackercostrange = {2,3};
-		int[] intersubnetnumberofedgerange = {1,2};
+		int[] nodevaluerange = {7, 10};
+		int[] defcostrange = {0,0}; // make this 2d
+		int[] attackercostrange = {0,0}; // make this 2d
+		int[] intersubnetnumberofedgerange = {1,1}; //make this 3d/2d
 		int nsub = numberofnodes/nsubnet;
 		int min = (nsub-1)*(nsub-2)/2 + 1;
 		int max = nsub*(nsub-1)/2;
 		int[] intrasubnetnumberofedgerange = {min, max};
+		int iter=0;
 
 
 
-		HashMap<Integer, Node> nodes2 = createNetwork(nsubnet, numberofnodes, nodesinsubnet, intrasubtransmissionprob, intrasubtransmissionprobnoise, intersubtransmissionprob, 
+		HashMap<Integer, Node> nodes = createNetwork(nsubnet, numberofnodes, nodesinsubnet, intrasubtransmissionprob, intrasubtransmissionprobnoise, intersubtransmissionprob, 
 				intersubtransmissionprobnoise, nodevaluerange, defcostrange, attackercostrange, intersubnetnumberofedgerange, intrasubnetnumberofedgerange);		
 
-		printNodes(nodes2);
-
-
-		HashMap<Integer, Node> nodes = createNetwork();
 		printNodes(nodes);
+
+
+		//HashMap<Integer, Node> nodes = createNetwork();
+		//printNodes(nodes);
 
 		HashMap<String, Double> attackerpayoffs = new  HashMap<String, Double>();
 		HashMap<String, Double> defenderpayoffs = new  HashMap<String, Double>();
 		doMonteCarloSimulation(nodes, defenderpayoffs, attackerpayoffs);
-		buildGameFile(naction, defenderpayoffs, attackerpayoffs, 9);
+		buildGameFile(naction, defenderpayoffs, attackerpayoffs, naction[0], iter);
+
+
+	}
+	
+	
+	
+	private static void doMonteCarloSimulation(HashMap<Integer, Node> nodes, HashMap<String,Double> defenderpayoffs, HashMap<String,Double> attackerpayoffs) {
+
+
+		int LIMIT = 10000;
+
+		/*HashMap<String, Double> attackerpayoffs = new  HashMap<String, Double>();
+		HashMap<String, Double> defenderpayoffs = new  HashMap<String, Double>();*/
+
+
+		for(Node hardendenode : nodes.values())
+		{
+			//hardendenode.setHardended(true);
+			for(Node attackednode: nodes.values())
+			{
+				// harden the defended node
+
+				
+				double sumatt = 0.0;
+				double sumdef = 0.0;		
+				
+				for(int iter = 0; iter<=LIMIT; iter++)
+				{
+					Random rand = new Random();
+					double attackerpoints = 0.0;
+					double defenderpoints = 0.0;
+
+
+					//defenderpoints += (0.0 - hardendenode.defcost);
+					//attackerpoints +=(0.0 -ha)
+
+
+					//System.out.println("("+hardendenode.id + ","+ attackednode.id+ ") , iter  " + iter);
+
+
+					Node start = new Node(attackednode);
+
+					PriorityQueue<Node> fringequeue = new PriorityQueue<Node>(1000, new Comparator<Node>() 
+					{  
+						public int compare(Node w1, Node w2) 
+						{                         
+							return (int)(w1.depth - w2.depth);
+						}      
+					});
+
+					ArrayList<Integer> closednodes = new ArrayList<Integer>();
+
+					fringequeue.add(start);
+					while(fringequeue.size()>0)
+					{
+						// poll a node
+						Node curnode = fringequeue.poll();
+						closednodes.add(curnode.id);
+						
+						if(curnode.id == hardendenode.id)
+						{
+							defenderpoints += -curnode.getValue();
+							attackerpoints = 0;
+							break;
+						}
+						
+						defenderpoints += -curnode.getValue();
+						attackerpoints += curnode.getValue();
+
+						//System.out.println("polled node "+ curnode.id);
+
+						Node curorignode = nodes.get(curnode.id);
+
+						double beta = 1;
+						double gamma = 1;
+
+						if(curnode.id == hardendenode.id)
+						{
+							beta = 0.5;
+							gamma = 0.5;
+						}
+
+						for(Node nei: curorignode.neighbors.values())
+						{
+
+							// for every neighbor of that node make a decision
+							// if the pollling node is the hardend one, then every outgoing prob will be reduced by beta
+							// and the reward will be reduced by gamma
+							// if went through then add the neighbor to the queue and sum the reward
+
+
+							if(!closednodes.contains(nei.id))
+							{
+
+								double prob = curorignode.getTransitionProbs(nei);
+								// generate a random double
+								
+								double r = rand.nextDouble();
+								if(r<(prob*beta))
+								{
+									// the attack went through
+									//attackerpoints += (nei.value*gamma);
+									//defenderpoints += -((nei.value*gamma));
+									Node newnode = new Node(nei);
+									newnode.setValue(nei.value*gamma);
+									newnode.depth = curnode.depth + 1;
+									fringequeue.add(newnode);
+								}
+							}
+						}
+
+					}
+					
+					sumatt += attackerpoints;
+					sumdef += defenderpoints;
+					
+
+				}
+
+				sumatt /= LIMIT;
+				sumdef /= LIMIT;
+
+				System.out.println("("+hardendenode.id + ","+ attackednode.id+ ") = " + sumatt);
+
+				String key = hardendenode.id + ","+attackednode.id;
+
+				attackerpayoffs.put(key, sumatt);
+				defenderpayoffs.put(key, sumdef);
+
+
+			}
+		}
+
 
 
 	}
 
+	/*private static void printNodes(HashMap<Integer, Node> nodes) {
+
+
+		for(Node n: nodes.values())
+		{
+			System.out.println("\n\n*******Node "+n.id+" *******");
+			System.out.println("Id: "+ n.id);
+			System.out.println("value: "+ n.value);
+			System.out.println("Subnet id: "+ n.subnetid);
+			//System.out.println("Neighbors : ");
+			for(Node nei: n.transitionprobs.keySet())
+			{
+				System.out.println("Neighbor: "+ nei.id + ", prob: "+ n.transitionprobs.get(nei) + ", subnet: "+ nei.subnetid);
+			}
+
+
+		}
+
+
+	}
+*/
+
+	
+	
+	/*private static void doMonteCarloSimulation(HashMap<Integer, Node> nodes, HashMap<String,Double> defenderpayoffs, HashMap<String,Double> attackerpayoffs) {
+
+
+		int LIMIT = 10000;
+
+		HashMap<String, Double> attackerpayoffs = new  HashMap<String, Double>();
+		HashMap<String, Double> defenderpayoffs = new  HashMap<String, Double>();
+
+		double totalattpoints = 0;
+		double totaldefpoints = 0;
+
+		for(Node hardendenode : nodes.values())
+		{
+			//hardendenode.setHardended(true);
+			for(Node attstartnode: nodes.values())
+			{
+				// harden the defended node
+
+				if(hardendenode.id==6 && attstartnode.id==0)
+				{
+					int f=0;
+				}
+				
+				
+				double attackerpoints = 0.0;
+				double defenderpoints = 0.0;
+
+				for(int iter = 0; iter<=LIMIT; iter++)
+				{
+					
+					// attackerpoints = 0.0;
+					// defenderpoints = 0.0;
+
+					defenderpoints += (0.0 - hardendenode.defcost);
+					attackerpoints += (0.0 - hardendenode.attackercost);
+
+
+
+					//System.out.println("("+hardendenode.id + ","+ attackednode.id+ ") , iter  " + iter);
+
+
+					Node start = new Node(attstartnode);
+					start.setProb(1.0);
+
+					Queue<Node> fringequeue = new LinkedList<Node>(); 
+					
+
+					ArrayList<Integer> closednodes = new ArrayList<Integer>();
+
+					fringequeue.add(start);
+					while(fringequeue.size()>0)
+					{
+						// poll a node
+						Node curnode = fringequeue.poll();
+						
+						Node curorignode = nodes.get(curnode.id);
+						
+						double beta = 1;
+						double gamma = 1;
+						
+						
+						
+						
+						if(curnode.id == hardendenode.id)
+						{
+							beta = 0.5;
+							gamma = 0.5;
+						}
+						
+						double curprob = curnode.getProb();
+						
+						Random rand = new Random();
+						double r = rand.nextDouble();
+						if(r<(curprob*beta))
+						{
+							
+							
+							if(curnode.id == hardendenode.id)
+							{
+								defenderpoints += -((curnode.value*gamma));
+								attackerpoints = 0;
+								break;
+							}
+							else
+							{
+								attackerpoints += (curnode.value*gamma);
+								defenderpoints += -((curnode.value*gamma));
+							}
+							
+							
+							closednodes.add(curnode.id);
+
+							for(Node nei: curorignode.neighbors.values())
+							{
+
+								// for every neighbor of that node make a decision
+								// if the pollling node is the hardend one, then every outgoing prob will be reduced by beta
+								// and the reward will be reduced by gamma
+								// if went through then add the neighbor to the queue and sum the reward
+
+
+								if(!closednodes.contains(nei.id))
+								{
+									double prob = curorignode.getTransitionProbs(nei);
+									// generate a random double
+									
+										// the attack went through
+										//attackerpoints += (nei.value*gamma);
+										//defenderpoints += -((nei.value*gamma));
+										Node newnode = new Node(nei);
+										newnode.depth = curnode.depth + 1;
+										newnode.setProb(prob);
+										newnode.setValue(nei.value);
+										fringequeue.add(newnode);
+										
+									
+								}
+							}
+							
+						}
+						
+						
+					}
+					
+					//totalattpoints += attackerpoints;
+					//totaldefpoints += defenderpoints;
+
+				}
+
+				attackerpoints /= LIMIT;
+				defenderpoints /= LIMIT;
+				
+				
+
+				totalattpoints += attackerpoints;
+				totaldefpoints += defenderpoints;
+
+				System.out.println("("+hardendenode.id + ","+ attstartnode.id+ ") = " + totalattpoints);
+
+				String key = hardendenode.id + ","+attstartnode.id;
+
+				attackerpayoffs.put(key, totalattpoints);
+				defenderpayoffs.put(key, totaldefpoints);
+
+
+			}
+		}
+
+
+
+	}
+*/
 
 	/**
 	 * 
@@ -160,6 +472,10 @@ public class SubNet {
 
 								int [] e = {n.id, nei.id};
 								donedges.add(e);
+								notdonenodes.remove(index);
+							}
+							else
+							{
 								notdonenodes.remove(index);
 							}
 					}
@@ -362,12 +678,12 @@ public class SubNet {
 	}
 
 	private static void buildGameFile(int[] naction, HashMap<String, Double> defenderpayoffs,
-			HashMap<String, Double> attackerpayoffs, int gamenumber) throws FileNotFoundException {
+			HashMap<String, Double> attackerpayoffs, int gamenumber, int iter) throws FileNotFoundException {
 
 
 		MatrixGame game = new MatrixGame(2, naction);
 
-		PrintWriter pw1 = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+gamenumber+".csv"),true));
+		PrintWriter pw1 = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+gamenumber+"-"+iter+".csv"),true));
 
 
 		for(int i=0; i<naction[0]; i++)
@@ -397,7 +713,7 @@ public class SubNet {
 
 
 
-		String gamename = Parameters.GAME_FILES_PATH+gamenumber+Parameters.GAMUT_GAME_EXTENSION;
+		String gamename = Parameters.GAME_FILES_PATH+gamenumber+"-"+iter+Parameters.GAMUT_GAME_EXTENSION;
 
 		//	String gamename = Parameters.GAME_FILES_PATH+gamenumber+"-"+size+"-"+delta+Parameters.GAMUT_GAME_EXTENSION;
 		//String gmname = "k"+this.numberofclusters[0]+"-"+this.gamename;
@@ -416,116 +732,7 @@ public class SubNet {
 
 	}
 
-	private static void doMonteCarloSimulation(HashMap<Integer, Node> nodes, HashMap<String,Double> defenderpayoffs, HashMap<String,Double> attackerpayoffs) {
-
-
-		int LIMIT = 100000;
-
-		/*HashMap<String, Double> attackerpayoffs = new  HashMap<String, Double>();
-		HashMap<String, Double> defenderpayoffs = new  HashMap<String, Double>();*/
-
-
-		for(Node hardendenode : nodes.values())
-		{
-			//hardendenode.setHardended(true);
-			for(Node attackednode: nodes.values())
-			{
-				// harden the defended node
-
-				double attackerpoints = 0.0;
-				double defenderpoints = 0.0;
-
-				for(int iter = 0; iter<=LIMIT; iter++)
-				{
-
-					defenderpoints += (0.0 - hardendenode.defcost);
-
-
-
-					//System.out.println("("+hardendenode.id + ","+ attackednode.id+ ") , iter  " + iter);
-
-
-					Node start = new Node(attackednode);
-
-					PriorityQueue<Node> fringequeue = new PriorityQueue<Node>(1000, new Comparator<Node>() 
-					{  
-						public int compare(Node w1, Node w2) 
-						{                         
-							return (int)(w1.depth - w2.depth);
-						}      
-					});
-
-					ArrayList<Integer> closednodes = new ArrayList<Integer>();
-
-					fringequeue.add(start);
-					while(fringequeue.size()>0)
-					{
-						// poll a node
-						Node curnode = fringequeue.poll();
-						closednodes.add(curnode.id);
-
-						//System.out.println("polled node "+ curnode.id);
-
-						Node curorignode = nodes.get(curnode.id);
-
-						double beta = 1;
-						double gamma = 1;
-
-						if(curnode.id == hardendenode.id)
-						{
-							beta = 0.5;
-							gamma = 0.5;
-						}
-
-						for(Node nei: curorignode.neighbors.values())
-						{
-
-							// for every neighbor of that node make a decision
-							// if the pollling node is the hardend one, then every outgoing prob will be reduced by beta
-							// and the reward will be reduced by gamma
-							// if went through then add the neighbor to the queue and sum the reward
-
-
-							if(!closednodes.contains(nei.id))
-							{
-
-								double prob = curorignode.getTransitionProbs(nei);
-								// generate a random double
-								Random rand = new Random();
-								double r = rand.nextDouble();
-								if(r<(prob*beta))
-								{
-									// the attack went through
-									attackerpoints += (nei.value*gamma);
-									defenderpoints += -((nei.value*gamma));
-									Node newnode = new Node(nei);
-									newnode.depth = curnode.depth + 1;
-									fringequeue.add(newnode);
-								}
-							}
-						}
-
-					}
-
-				}
-
-				attackerpoints /= LIMIT;
-				defenderpoints /= LIMIT;
-
-				System.out.println("("+hardendenode.id + ","+ attackednode.id+ ") = " + attackerpoints);
-
-				String key = hardendenode.id + ","+attackednode.id;
-
-				attackerpayoffs.put(key, attackerpoints);
-				defenderpayoffs.put(key, defenderpoints);
-
-
-			}
-		}
-
-
-
-	}
+	
 
 	private static void printNodes(HashMap<Integer, Node> nodes) {
 
@@ -556,9 +763,9 @@ public class SubNet {
 		HashMap<Integer, Node> nodes = new HashMap<Integer, Node>();
 
 
-		Node a = new Node(0, 0, 10, false, 2, 2);
-		Node b = new Node(1, 0, 4, false, 1, 1);
-		Node c = new Node(2, 0, 6, false, 3, 3);
+		Node a = new Node(0, 0, 10, false, 0, 0);
+		Node b = new Node(1, 0, 9, false, 0, 0);
+		Node c = new Node(2, 0, 8, false, 0, 0);
 
 		a.addNeighbor(b);
 		a.setTransitionProbs(b, 0.7);
@@ -574,9 +781,9 @@ public class SubNet {
 
 
 		c.addNeighbor(b);
-		c.setTransitionProbs(b, 0.4);
+		c.setTransitionProbs(b, 0.9);
 		b.addNeighbor(c);
-		b.setTransitionProbs(c, 0.4);
+		b.setTransitionProbs(c, 0.9);
 
 
 
@@ -584,14 +791,14 @@ public class SubNet {
 
 
 
-		Node d = new Node(3, 1, 7, false, 1, 1);
-		Node e = new Node(4, 1, 8, false, 2, 2);
-		Node f = new Node(5, 1, 9, false, 3, 3);
+		Node d = new Node(3, 1, 7, false, 0, 0);
+		Node e = new Node(4, 1, 8, false, 0, 0);
+		Node f = new Node(5, 1, 9, false, 0, 0);
 
 		d.addNeighbor(e);
-		d.setTransitionProbs(e, 0.5);
+		d.setTransitionProbs(e, 0.7);
 		e.addNeighbor(d);
-		e.setTransitionProbs(d, 0.5);
+		e.setTransitionProbs(d, 0.7);
 
 
 
@@ -602,9 +809,9 @@ public class SubNet {
 
 
 		e.addNeighbor(f);
-		e.setTransitionProbs(f, 0.65);
+		e.setTransitionProbs(f, 0.8);
 		f.addNeighbor(e);
-		f.setTransitionProbs(e, 0.65);
+		f.setTransitionProbs(e, 0.8);
 
 
 
@@ -612,16 +819,16 @@ public class SubNet {
 
 
 
-		Node g = new Node(6, 2, 5, false, 1, 1);
-		Node h = new Node(7, 2, 9, false, 3, 3);
-		Node i = new Node(8, 2, 6, false, 2, 2);
+		Node g = new Node(6, 2, 7, false, 0, 0);
+		Node h = new Node(7, 2, 9, false, 0, 0);
+		Node i = new Node(8, 2, 8, false, 0, 0);
 
 
 
 		g.addNeighbor(h);
-		g.setTransitionProbs(h, 0.6);
+		g.setTransitionProbs(h, 0.7);
 		h.addNeighbor(g);
-		h.setTransitionProbs(g, 0.6);
+		h.setTransitionProbs(g, 0.7);
 
 
 		g.addNeighbor(i);
@@ -638,7 +845,7 @@ public class SubNet {
 
 
 
-		/*c.addNeighbor(d);
+		c.addNeighbor(d);
 		c.setTransitionProbs(d, 0.2);
 		d.addNeighbor(c);
 		d.setTransitionProbs(c, 0.2);
@@ -648,7 +855,7 @@ public class SubNet {
 		f.addNeighbor(g);
 		f.setTransitionProbs(g, 0.1);
 		g.addNeighbor(f);
-		g.setTransitionProbs(f, 0.1);*/
+		g.setTransitionProbs(f, 0.1);
 
 
 
@@ -684,13 +891,23 @@ class Node {
 
 	int id;  // unique across the network
 	int subnetid;
-	int value;
+	double value;
 	int defcost;
 	int attackercost;
 	boolean hardended= false;
 
 	int depth = 0;
+	
+	double prob = 0;
 
+
+	public double getProb() {
+		return prob;
+	}
+
+	public void setProb(double prob) {
+		this.prob = prob;
+	}
 
 	HashMap<Integer, Node> neighbors =  new HashMap<Integer, Node>();
 	HashMap<Node, Double> transitionprobs = new HashMap<Node, Double>();
@@ -740,10 +957,10 @@ class Node {
 	public void setSubnetid(int subnetid) {
 		this.subnetid = subnetid;
 	}
-	public int getValue() {
+	public double getValue() {
 		return value;
 	}
-	public void setValue(int value) {
+	public void setValue(double value) {
 		this.value = value;
 	}
 

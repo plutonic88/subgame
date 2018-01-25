@@ -2994,7 +2994,7 @@ public class GameReductionBySubGame {
 		//long kmeantime = 0;
 		for(int gamenumber = 0; gamenumber < totalgames; gamenumber++)
 		{
-			MatrixGame tstgame = new MatrixGame(GamutParser.readGamutGame(Parameters.GAME_FILES_PATH+gamenumber+Parameters.GAMUT_GAME_EXTENSION));
+			MatrixGame tstgame = new MatrixGame(GamutParser.readGamutGame(Parameters.GAME_FILES_PATH+numberofaction+"-"+gamenumber+Parameters.GAMUT_GAME_EXTENSION));
 			GameReductionBySubGame.setIsfirstiteration(true);
 			gmr.setOriginalgame(tstgame);
 			printgame(tstgame, gamenumber);
@@ -3304,13 +3304,13 @@ public class GameReductionBySubGame {
 
 
 
-		System.out.println(delta+","+ 
+		/*System.out.println(delta+","+ 
 
 
 				+
 				((GameReductionBySubGame.psnetimer))/totalgames+","+
 				((GameReductionBySubGame.mebtimer))/totalgames+","+
-				((GameReductionBySubGame.qretimer))/totalgames );
+				((GameReductionBySubGame.qretimer))/totalgames );*/
 
 	}
 
@@ -4504,7 +4504,7 @@ public class GameReductionBySubGame {
 			for(int j=0; j<numberofcluster; j++)
 			{
 				int count = 0;
-				while(count<3)
+				while(count<actionpercluster)
 				{
 							partition[i][j].add(x);
 							x++;
