@@ -726,7 +726,9 @@ public class Main {
 			
 			//GameReductionBySubGame.testCyberSubGame();
 			//SubNet.doExp();
-			SubNet.transmissionExp();
+			//SubNet.transmissionExp();
+			
+			SubNet.deltaExp();
 			
 			
 			
