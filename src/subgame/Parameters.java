@@ -23,7 +23,7 @@ public class Parameters {
 
   //path to gambit
   //public static final String GAMBIT_LOGIT_PATH = "C:\\Program Files (x86)\\gambit\\gambit-logit";
-  public static final String GAMBIT_LOGIT_PATH = "/Users/anjonsunny/research/gambit/gambit-logit";
+  public static final String GAMBIT_LOGIT_PATH = "/Users/anjonsunny/eclipse-workspace/subgame/lib/gambit-logit";
 
   // file extension for gamut games
   public static final String GAMUT_GAME_EXTENSION = ".gamut";
