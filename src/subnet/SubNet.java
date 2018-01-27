@@ -83,7 +83,7 @@ public class SubNet {
 		{
 			//hardendenode.setHardended(true);
 
-			System.out.println("\n*****Hardended node "+ hardendenode.id);
+			//System.out.println("\n*****Hardended node "+ hardendenode.id);
 
 			for(Node attackednode: nodes.values())
 			{
@@ -491,7 +491,7 @@ public class SubNet {
 			int totaledgedone = 0;
 			ArrayList<int[]> donedges = new ArrayList<int[]>();
 
-			double prob = randInt(intrasubtransmissionprob[0], intrasubtransmissionprob[1])/100.0;
+			
 
 			for(Node n: subnetnodes.values())
 			{
@@ -527,7 +527,7 @@ public class SubNet {
 						if(isok)
 						{
 
-
+							double prob = randInt(intrasubtransmissionprob[0], intrasubtransmissionprob[1])/100.0;
 							n.addNeighbor(nei);
 							double probnoise = randInt(0, (int)intrasubtransmissionprobnoise)/100.0;
 							n.setTransitionProbs(nei, prob-probnoise);
@@ -578,7 +578,7 @@ public class SubNet {
 								boolean isok = isOK(n, nei, donedges);
 								if(isok)
 								{
-
+									double prob = randInt(intrasubtransmissionprob[0], intrasubtransmissionprob[1])/100.0;
 									n.addNeighbor(nei);
 									double probnoise = randInt(0, (int)intrasubtransmissionprobnoise)/100.0;
 									n.setTransitionProbs(nei, prob-probnoise);
@@ -778,12 +778,12 @@ public class SubNet {
 
 				game.setPayoffs(outcome, payoffs);
 
-				System.out.print(payoffs[0]+","+payoffs[1] + "  ");
+				//System.out.print(payoffs[0]+","+payoffs[1] + "  ");
 
 				pw1.append(payoffs[0]+"|"+payoffs[1] + ",");
 
 			}
-			System.out.println();
+			//System.out.println();
 			pw1.append("\n");
 		}
 
@@ -993,11 +993,11 @@ public class SubNet {
 		int nsubnet = ncluster;
 		int numberofnodes = naction2;
 		int nodesinsubnet[] = new int[nsubnet];
-		int intrasubtransmissionprob[] = {50, 50}; //make this 2d
-		double intrasubtransmissionprobnoise = 5;
-		int intersubtransmissionprob[] = {90, 100}; // make this 2d/3d
+		int intrasubtransmissionprob[] = {100, 100}; //make this 2d
+		double intrasubtransmissionprobnoise = 0;
+		int intersubtransmissionprob[] = {10, 20}; // make this 2d/3d
 		double intersubtransmissionprobnoise = 0; // no need
-		int[] nodevaluerange = {6, 10};
+		int[] nodevaluerange = {5, 10};
 		int[] defcostrange = {1,3}; // make this 2d
 		int defendercostnoise = 0;
 		int[] attackercostrange = {1,3}; // make this 2d

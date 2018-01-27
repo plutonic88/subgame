@@ -60,6 +60,13 @@ public class MinEpsilonBoundSolver {
     return strategies;
   }
 
+  
+  /**
+   * 
+   * @param game abstract game
+   * @param upperBounds
+   * @return
+   */
   public static ArrayList<MixedStrategy> getMinEpsilonBoundProfile(Game game, Game upperBounds) {
     double bestEpsilon = Double.POSITIVE_INFINITY;
     int[] bestOutcome = new int[game.getNumPlayers()];

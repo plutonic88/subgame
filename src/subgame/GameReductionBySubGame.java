@@ -3760,7 +3760,7 @@ public class GameReductionBySubGame {
 			MatrixGame tstgame = new MatrixGame(GamutParser.readGamutGame(Parameters.GAME_FILES_PATH+numberofaction+"-"+gamenumber+Parameters.GAMUT_GAME_EXTENSION));
 			GameReductionBySubGame.setIsfirstiteration(true);
 			gmr.setOriginalgame(tstgame);
-			printgame(tstgame, gamenumber);
+			//printgame(tstgame, gamenumber);
 			makeDeepCopyPartition(allparitions.get(0), GameReductionBySubGame.partition);
 			double[] tmpdelta = computeAllDelta(tstgame, GameReductionBySubGame.partition);
 			sumdelta[0] += tmpdelta[0];
