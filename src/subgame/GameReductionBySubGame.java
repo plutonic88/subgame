@@ -3752,7 +3752,7 @@ public class GameReductionBySubGame {
 		setupPartitionV2(numberofaction, numberofcluster, numberofplayers, totalgames, size, delta, dummypartition, allparitions);
 
 		
-		double sumdelta = 0;
+		double[] sumdelta = { 0, 0};
 		
 		
 		for(int gamenumber = 0; gamenumber < totalgames; gamenumber++)
@@ -3762,14 +3762,15 @@ public class GameReductionBySubGame {
 			gmr.setOriginalgame(tstgame);
 			printgame(tstgame, gamenumber);
 			makeDeepCopyPartition(allparitions.get(0), GameReductionBySubGame.partition);
-			double tmpdelta = computeDelta(tstgame, GameReductionBySubGame.partition);
-			sumdelta += tmpdelta;
+			double[] tmpdelta = computeAllDelta(tstgame, GameReductionBySubGame.partition);
+			sumdelta[0] += tmpdelta[0];
+			sumdelta[1] += tmpdelta[1];
 			
 			try
 			{
 				PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+"game-delta.csv"),true));
 				// gamenumber, subgame, psne, meb,qre
-				pw.append(gamenumber+","+tmpdelta+"\n");
+				pw.append(gamenumber+","+tmpdelta[0]+","+tmpdelta[1]+"\n");
 				pw.close();
 			}
 			catch(Exception ex)
@@ -3779,19 +3780,20 @@ public class GameReductionBySubGame {
 		}
 		
 		
-		sumdelta /= iTER_LIMIT;
+		sumdelta[0] /= iTER_LIMIT;
+		sumdelta[1] /= iTER_LIMIT;
 		try
 		{
 			PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+"full-delta.csv"),true));
 			// gamenumber, subgame, psne, meb,qre
-			pw.append(sumdelta+"\n");
+			pw.append(sumdelta[0]+","+sumdelta[1]+"\n");
 			pw.close();
 		}
 		catch(Exception ex)
 		{
 			System.out.println("Gamereductionclass class :something went terribly wrong during file writing ");
 		}
-		System.out.println("delta:  "+ sumdelta);
+		System.out.println("delta:  "+ sumdelta[0]+","+sumdelta[1]);
 
 		
 	}
@@ -3809,6 +3811,21 @@ public class GameReductionBySubGame {
 
 
 
+private static double[] computeAllDelta(MatrixGame tstgame, List<Integer>[][] partition) {
+
+
+
+	//MatrixGame testgm = GameReductionBySubGame.makeTestGame(i, size, delta);
+	double[] delta1 = calculateDelta(tstgame, partition, 0, true);
+	double[] delta2 = calculateDelta(tstgame, partition, 1, true);
+	//System.out.println("Deltas: "+ delta1[0]+" "+delta2[0]);
+
+	return new double[]{delta1[0], delta2[0]};
+
+
+}
+
+
 private static double computeDelta(MatrixGame tstgame, List<Integer>[][] partition) {
 
 
@@ -3822,6 +3839,7 @@ private static double computeDelta(MatrixGame tstgame, List<Integer>[][] partiti
 
 
 }
+
 
 
 

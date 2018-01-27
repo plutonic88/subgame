@@ -19,6 +19,10 @@ import subgame.Parameters;
 
 public class SubNet {
 
+
+
+	public static Random rand = new Random(20);
+
 	public static void doExp() throws FileNotFoundException {
 
 
@@ -78,6 +82,9 @@ public class SubNet {
 		for(Node hardendenode : nodes.values())
 		{
 			//hardendenode.setHardended(true);
+
+			System.out.println("\n*****Hardended node "+ hardendenode.id);
+
 			for(Node attackednode: nodes.values())
 			{
 				// harden the defended node
@@ -88,6 +95,10 @@ public class SubNet {
 
 				for(int iter = 0; iter<=LIMIT; iter++)
 				{
+
+					//System.out.println("\n*****ITER no "+ iter);
+
+
 					Random rand = new Random();
 					double attackerpoints = 0.0;
 					double defenderpoints = 0.0;
@@ -106,30 +117,53 @@ public class SubNet {
 					{  
 						public int compare(Node w1, Node w2) 
 						{                         
-							return (int)(w1.depth - w2.depth);
+							return (int)(w1.prob - w2.prob);
 						}      
 					});
+
+					if(hardendenode.id==0 && attackednode.id==5)
+					{
+						int f=1;
+					}
 
 					ArrayList<Integer> closednodes = new ArrayList<Integer>();
 
 					fringequeue.add(start);
+
+					boolean[] visited = new boolean[nodes.size()];
+
+
 					while(fringequeue.size()>0)
 					{
 						// poll a node
 						Node curnode = fringequeue.poll();
-						closednodes.add(curnode.id);
+
+						//System.out.println("polling node "+ curnode.id + ", v: "+ curnode.value);
+
+
+						//System.out.println("Closed nodes ");
+
+						//printClosedNodes(closednodes);
+
+
 
 						if(curnode.id == hardendenode.id)
 						{
 							defenderpoints += - (curnode.getValue()+ curnode.defcost);
+
 							attackerpoints = 0;
+							//System.out.println("attackerpoints "+ attackerpoints);
 							break;
 						}
 
 						defenderpoints += - (curnode.getValue()+ curnode.defcost);
 						attackerpoints += (curnode.getValue()- curnode.attackercost);
 
+						//System.out.println("attackerpoints "+ attackerpoints);
+						//System.out.println("sumatt "+ sumatt);
+
 						//System.out.println("polled node "+ curnode.id);
+						//System.out.println("Adding points for node "+  curnode.id);
 
 						Node curorignode = nodes.get(curnode.id);
 
@@ -142,6 +176,8 @@ public class SubNet {
 							gamma = 0.5;
 						}
 
+						closednodes.add(curnode.id);
+
 						for(Node nei: curorignode.neighbors.values())
 						{
 
@@ -151,7 +187,7 @@ public class SubNet {
 							// if went through then add the neighbor to the queue and sum the reward
 
 
-							if(!closednodes.contains(nei.id))
+							if(!closednodes.contains(nei.id) && visited[nei.id]==false)
 							{
 
 								double prob = curorignode.getTransitionProbs(nei);
@@ -167,6 +203,10 @@ public class SubNet {
 									newnode.setValue(nei.value*gamma);
 									newnode.depth = curnode.depth + 1;
 									fringequeue.add(newnode);
+									//System.out.print("Closed node : ");
+									//printClosedNodes(closednodes);
+									//System.out.println("Adding node "+ newnode.id + "\n");
+									visited[newnode.id] = true;
 								}
 							}
 						}
@@ -175,6 +215,9 @@ public class SubNet {
 
 					sumatt += attackerpoints;
 					sumdef += defenderpoints;
+
+					//	System.out.println("attackerpoints "+ attackerpoints);
+					//	System.out.println("sumatt "+ sumatt);
 
 
 				}
@@ -374,6 +417,20 @@ public class SubNet {
 	}
 	 */
 
+	private static void printClosedNodes(ArrayList<Integer> closednodes) {
+
+
+		for(Integer n: closednodes)
+		{
+			System.out.print(n+" ");
+		}
+
+		System.out.println();
+
+	}
+
+
+
 	/**
 	 * 
 	 * @param nsubnet
@@ -414,7 +471,7 @@ public class SubNet {
 				int defcostnoise = randInt(0, defendercostnoise);
 				int attcostnoise = randInt(0, attackercostnoise);
 				int attackercost = randInt(attackercostrange[0], attackercostrange[1]);
-				Node node = new Node(nodeid, subnet, nodeval, false, defcost-defcostnoise, attackercost-attackercostnoise);
+				Node node = new Node(nodeid, subnet, nodeval, false, defcost+defcostnoise, attackercost+attcostnoise);
 				nodes.put(nodeid, node);
 				nodeid++;
 			}
@@ -575,45 +632,50 @@ public class SubNet {
 
 						ArrayList<int[]> done = new ArrayList<int[]>();
 
-						while(true)
+
+						if(nedge>0)
 						{
 
-							// pick two nodes randomly from two subnet and add them... 
-							// add prob
-
-							int index1 = randInt(0, s1nodes.size()-1);
-							int index2 = randInt(0, s2nodes.size()-1);
-
-							int n1 = s1nodes.get(index1);
-							int  n2 = s2nodes.get(index2);
-
-							boolean ok = isOK(n1, n2, done);
-
-							if(ok)
+							while(true)
 							{
-								Node n1node = subnet1nodes.get(n1);
-								Node n2node = subnet2nodes.get(n2);
+
+								// pick two nodes randomly from two subnet and add them... 
+								// add prob
+
+								int index1 = randInt(0, s1nodes.size()-1);
+								int index2 = randInt(0, s2nodes.size()-1);
+
+								int n1 = s1nodes.get(index1);
+								int  n2 = s2nodes.get(index2);
+
+								boolean ok = isOK(n1, n2, done);
+
+								if(ok)
+								{
+									Node n1node = subnet1nodes.get(n1);
+									Node n2node = subnet2nodes.get(n2);
 
 
-								double prob = randInt(intersubtransmissionprob[0], intersubtransmissionprob[0])/100.0;
+									double prob = randInt(intersubtransmissionprob[0], intersubtransmissionprob[0])/100.0;
 
-								n1node.addNeighbor(n2node);
-								n1node.setTransitionProbs(n2node, prob);
-
-
-								n2node.addNeighbor(n1node);
-								n2node.setTransitionProbs(n1node, prob);
-
-								int[] e = {n1, n2};
-
-								done.add(e);
-
-								edgecount++;
-							}
+									n1node.addNeighbor(n2node);
+									n1node.setTransitionProbs(n2node, prob);
 
 
-							if(edgecount==nedge)
-								break;
+									n2node.addNeighbor(n1node);
+									n2node.setTransitionProbs(n1node, prob);
+
+									int[] e = {n1, n2};
+
+									done.add(e);
+
+									edgecount++;
+								}
+
+
+								if(edgecount==nedge)
+									break;
+							} // end while loop
 						}
 
 
@@ -685,7 +747,7 @@ public class SubNet {
 
 		// Usually this should be a field rather than a method variable so
 		// that it is not re-seeded every call.
-		Random rand = new Random();
+
 
 		// nextInt is normally exclusive of the top value,
 		// so add 1 to make it inclusive
@@ -931,14 +993,14 @@ public class SubNet {
 		int nsubnet = ncluster;
 		int numberofnodes = naction2;
 		int nodesinsubnet[] = new int[nsubnet];
-		int intrasubtransmissionprob[] = {100, 100}; //make this 2d
-		double intrasubtransmissionprobnoise = 0;
-		int intersubtransmissionprob[] = {10, 20}; // make this 2d/3d
-		double intersubtransmissionprobnoise = 0;
-		int[] nodevaluerange = {7, 9};
-		int[] defcostrange = {0,0}; // make this 2d
+		int intrasubtransmissionprob[] = {50, 50}; //make this 2d
+		double intrasubtransmissionprobnoise = 5;
+		int intersubtransmissionprob[] = {90, 100}; // make this 2d/3d
+		double intersubtransmissionprobnoise = 0; // no need
+		int[] nodevaluerange = {6, 10};
+		int[] defcostrange = {1,3}; // make this 2d
 		int defendercostnoise = 0;
-		int[] attackercostrange = {0,0}; // make this 2d
+		int[] attackercostrange = {1,3}; // make this 2d
 		int attackercostnoise = 0;
 		int[] intersubnetnumberofedgerange = {1,1}; //make this 3d/2d
 		int nsub = numberofnodes/nsubnet;
@@ -962,8 +1024,8 @@ public class SubNet {
 					intersubtransmissionprobnoise, nodevaluerange, defcostrange, attackercostrange, 
 					intersubnetnumberofedgerange, intrasubnetnumberofedgerange, defendercostnoise, attackercostnoise, connectsubnets);		
 
-			printNodes(nodes);
-
+			//printNodes(nodes);
+			printSubNets(nodes, nsubnet);
 
 			//HashMap<Integer, Node> nodes = createNetwork();
 			//printNodes(nodes);
@@ -978,23 +1040,48 @@ public class SubNet {
 
 
 
+	private static void printSubNets(HashMap<Integer, Node> nodes, int nsubnet) {
+
+
+		for(int isub=0; isub<nsubnet; isub++)
+		{
+
+			for(Node n: nodes.values())
+			{
+				if(n.subnetid==isub)
+				{
+					System.out.println("\n\n*******Node "+n.id+" *******");
+					System.out.println("Id: "+ n.id);
+					System.out.println("value: "+ n.value);
+					System.out.println("Subnet id: "+ n.subnetid);
+					//System.out.println("Neighbors : ");
+					for(Node nei: n.transitionprobs.keySet())
+					{
+						System.out.println("Neighbor: "+ nei.id + ", prob: "+ n.transitionprobs.get(nei) + ", subnet: "+ nei.subnetid);
+					}
+				}
+
+
+			}
+		}
+
+	}
+
+
+
 	public static void deltaExp() throws Exception {
 
 
-		int ITER_LIMIT = 5;
-		int naction = 9;
+		int ITER_LIMIT = 1;
+		int naction = 25;
 		int nplayer = 2;
-		int ncluster = 3;
-		boolean connectsubnets = false;
+		int ncluster = 5;
+		boolean connectsubnets = true;
 		// set up the game parameters before experiments
 		buildExperimentGames(ITER_LIMIT, naction, nplayer, ncluster, connectsubnets);
 
 
 		GameReductionBySubGame.deltaExp(nplayer, ncluster, naction, ITER_LIMIT);
-
-
-
-
 
 
 	}
