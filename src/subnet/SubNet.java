@@ -993,9 +993,9 @@ public class SubNet {
 		int nsubnet = ncluster;
 		int numberofnodes = naction2;
 		int nodesinsubnet[] = new int[nsubnet];
-		int intrasubtransmissionprob[] = {100, 100}; //make this 2d
+		int intrasubtransmissionprob[] = {60, 100}; //make this 2d
 		double intrasubtransmissionprobnoise = 0;
-		int intersubtransmissionprob[] = {10, 20}; // make this 2d/3d
+		int intersubtransmissionprob[] = {10, 30}; // make this 2d/3d
 		double intersubtransmissionprobnoise = 0; // no need
 		int[] nodevaluerange = {5, 10};
 		int[] defcostrange = {1,3}; // make this 2d
@@ -1073,15 +1073,18 @@ public class SubNet {
 
 
 		int ITER_LIMIT = 1;
-		int naction = 25;
+		int naction = 100;
 		int nplayer = 2;
-		int ncluster = 5;
+		int ncluster = 10;
 		boolean connectsubnets = true;
 		// set up the game parameters before experiments
 		buildExperimentGames(ITER_LIMIT, naction, nplayer, ncluster, connectsubnets);
 
 
 		GameReductionBySubGame.deltaExp(nplayer, ncluster, naction, ITER_LIMIT);
+		
+		
+		GameReductionBySubGame.transmissionExp(ITER_LIMIT, naction, nplayer, ncluster);
 
 
 	}
