@@ -173,7 +173,7 @@ public class SubNet {
 						if(curnode.id == hardendenode.id)
 						{
 							beta = 0.5;
-							gamma = 0.5;
+							//gamma = 0.5;
 						}
 
 						closednodes.add(curnode.id);
@@ -189,6 +189,12 @@ public class SubNet {
 
 							if(!closednodes.contains(nei.id) && visited[nei.id]==false)
 							{
+								if(nei.id == hardendenode.id)
+								{
+									beta = 0.5;
+									gamma = 0.5;
+								}
+								
 
 								double prob = curorignode.getTransitionProbs(nei);
 								// generate a random double
@@ -201,6 +207,7 @@ public class SubNet {
 									//defenderpoints += -((nei.value*gamma));
 									Node newnode = new Node(nei);
 									newnode.setValue(nei.value*gamma);
+									newnode.setProb(prob);
 									newnode.depth = curnode.depth + 1;
 									fringequeue.add(newnode);
 									//System.out.print("Closed node : ");
@@ -762,7 +769,7 @@ public class SubNet {
 
 		MatrixGame game = new MatrixGame(2, naction);
 
-		PrintWriter pw1 = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+gamenumber+"-"+iter+".csv"),true));
+		PrintWriter pw1 = new PrintWriter(new FileOutputStream(new File(/*Parameters.GAME_FILES_PATH+*/gamenumber+"-"+iter+".csv"),true));
 
 
 		for(int i=0; i<naction[0]; i++)
@@ -792,7 +799,7 @@ public class SubNet {
 
 
 
-		String gamename = Parameters.GAME_FILES_PATH+gamenumber+"-"+iter+Parameters.GAMUT_GAME_EXTENSION;
+		String gamename = /*Parameters.GAME_FILES_PATH+*/gamenumber+"-"+iter+Parameters.GAMUT_GAME_EXTENSION;
 
 		//	String gamename = Parameters.GAME_FILES_PATH+gamenumber+"-"+size+"-"+delta+Parameters.GAMUT_GAME_EXTENSION;
 		//String gmname = "k"+this.numberofclusters[0]+"-"+this.gamename;
@@ -993,11 +1000,11 @@ public class SubNet {
 		int nsubnet = ncluster;
 		int numberofnodes = naction2;
 		int nodesinsubnet[] = new int[nsubnet];
-		int intrasubtransmissionprob[] = {60, 100}; //make this 2d
+		int intrasubtransmissionprob[] = {40, 50}; //make this 2d
 		double intrasubtransmissionprobnoise = 0;
-		int intersubtransmissionprob[] = {10, 30}; // make this 2d/3d
+		int intersubtransmissionprob[] = {10, 20}; // make this 2d/3d
 		double intersubtransmissionprobnoise = 0; // no need
-		int[] nodevaluerange = {5, 10};
+		int[] nodevaluerange = {6, 10};
 		int[] defcostrange = {1,3}; // make this 2d
 		int defendercostnoise = 0;
 		int[] attackercostrange = {1,3}; // make this 2d
@@ -1069,13 +1076,13 @@ public class SubNet {
 
 
 
-	public static void deltaExp() throws Exception {
+	public static void deltaExp(int naction, int ncluster) throws Exception {
 
 
 		int ITER_LIMIT = 1;
-		int naction = 100;
+		//int naction = Integer.parseInt(args[0]);
 		int nplayer = 2;
-		int ncluster = 10;
+		//int ncluster = 5;
 		boolean connectsubnets = true;
 		// set up the game parameters before experiments
 		buildExperimentGames(ITER_LIMIT, naction, nplayer, ncluster, connectsubnets);

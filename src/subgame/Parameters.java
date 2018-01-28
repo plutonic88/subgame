@@ -8,7 +8,7 @@ public class Parameters {
   // base path to storage location of generated game instances
   //public static final String GAME_FILES_PATH = "/home/ckiekint/IdeaProjects/EmpiricalGameAnalysis/game_files/";
   //public static final String GAME_FILES_PATH = "C:\\Users\\Oscar-XPS\\Documents\\game\\game_files\\";
-  public static final String GAME_FILES_PATH = "/Users/anjonsunny/eclipse-workspace/subgame/result/";
+  public static final String GAME_FILES_PATH = "/Users/anjonsunny/eclipse-workspace/subgame/";
     //public static final String GAME_FILES_PATH = "";
 
   // base path to the directory where results should be stored

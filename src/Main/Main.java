@@ -728,7 +728,10 @@ public class Main {
 			//SubNet.doExp();
 			//SubNet.transmissionExp();
 			
-			SubNet.deltaExp();
+			int naction = 40;//Integer.parseInt(args[0]);
+			int ncluster = 4;//Integer.parseInt(args[1]);
+			
+			SubNet.deltaExp(naction, ncluster);
 			
 			
 			
