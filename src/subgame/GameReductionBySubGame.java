@@ -3377,7 +3377,7 @@ public class GameReductionBySubGame {
 		//long kmeantime = 0;
 		for(int gamenumber = 0; gamenumber < totalgames; gamenumber++)
 		{
-			MatrixGame tstgame = new MatrixGame(GamutParser.readGamutGame(Parameters.GAME_FILES_PATH+numberofaction+"-"+gamenumber+Parameters.GAMUT_GAME_EXTENSION));
+			MatrixGame tstgame = new MatrixGame(GamutParser.readGamutGame(Parameters.GAME_FILES_PATH+numberofaction+"-"+numberofcluster+"-"+gamenumber+Parameters.GAMUT_GAME_EXTENSION));
 
 
 
@@ -3755,7 +3755,7 @@ public class GameReductionBySubGame {
 
 		for(int gamenumber = 0; gamenumber < totalgames; gamenumber++)
 		{
-			MatrixGame tstgame = new MatrixGame(GamutParser.readGamutGame(Parameters.GAME_FILES_PATH+numberofaction+"-"+gamenumber+Parameters.GAMUT_GAME_EXTENSION));
+			MatrixGame tstgame = new MatrixGame(GamutParser.readGamutGame(Parameters.GAME_FILES_PATH+numberofaction+"-"+numberofcluster+"-"+gamenumber+Parameters.GAMUT_GAME_EXTENSION));
 			GameReductionBySubGame.setIsfirstiteration(true);
 			gmr.setOriginalgame(tstgame);
 			//printgame(tstgame, gamenumber);

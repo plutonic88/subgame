@@ -406,6 +406,9 @@ public class SolverExperiments
 		double[] mindeltas = new double[mg.getNumPlayers()]; // will contain the minimum delta for 2 players
 		double[] maxdeltas = new double[mindeltas.length]; 
 		// find the cluster with minimum delta
+		//clusterforplayers[0] = KmeanClustering.getBestCluster(deltasplayer1, maxdeltasplayer1,clustersplayer1, 0, mindeltas, maxdeltas, KmeanClustering.isMaxDelta());
+		//clusterforplayers[1] = KmeanClustering.getBestCluster(deltasplayer2, maxdeltasplayer2,clustersplayer2, 1, mindeltas, maxdeltas, KmeanClustering.isMaxDelta());
+		
 		clusterforplayers[0] = partition[0];//KmeanClustering.getBestCluster(deltasplayer1, maxdeltasplayer1,clustersplayer1, 0, mindeltas, maxdeltas, KmeanClustering.isMaxDelta());
 		clusterforplayers[1] = partition[1];//KmeanClustering.getBestCluster(deltasplayer2, maxdeltasplayer2,clustersplayer2, 1, mindeltas, maxdeltas, KmeanClustering.isMaxDelta());
 		//Logger.log("\n Player 0 min delta : "+ mindeltas[0]+ " \n player 1 min delta : "+ mindeltas[1], false);

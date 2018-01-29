@@ -1,11 +1,16 @@
 package subnetmarcus;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+
+
 
 
 public class Simulator {
 
 	public static ArrayList<Node> nodes;
 	public static ArrayList<ArrayList<Edge>> edges;
+	public static Random rand = new Random();
 
 	public static void initialize(){
 		nodes = new ArrayList<Node>();
@@ -79,6 +84,351 @@ public class Simulator {
 		edges.get(6).add(new Edge(6, 3, 0.3));
 		 */
 	}
+	
+	
+	public static int randInt(int min, int max) {
+
+		// Usually this should be a field rather than a method variable so
+		// that it is not re-seeded every call.
+
+
+		// nextInt is normally exclusive of the top value,
+		// so add 1 to make it inclusive
+		int randomNum = rand.nextInt((max - min) + 1) + min;
+
+		return randomNum;
+	}
+	
+	
+	/**
+	 * 
+	 * @param nsubnet
+	 * @param numberofnodes
+	 * @param nodesinsubnet
+	 * @param intrasubtransmissionprob
+	 * @param intrasubtransmissionprobnoise
+	 * @param intersubtransmissionprob
+	 * @param intersubtransmissionprobnoise
+	 * @param nodevaluerange
+	 * @param defcostrange
+	 * @param attackercostrange
+	 * @param intersubnetnumberofedgerange
+	 * @param intrasubnetnumberofedgerange
+	 * @param attackercostnoise 
+	 * @param defendercostnoise 
+	 * @param connectsubnets 
+	 * @return
+	 */
+	public static void createNetworkV2(int nsubnet, int numberofnodes, int[] nodesinsubnet,
+			int[] intrasubtransmissionprob, double intrasubtransmissionprobnoise, int[] intersubtransmissionprob,
+			double intersubtransmissionprobnoise, int[] nodevaluerange, int[] defcostrange, int[] attackercostrange,
+			int[] intersubnetnumberofedgerange, int[] intrasubnetnumberofedgerange, int defendercostnoise, int attackercostnoise, boolean connectsubnets) {
+
+		nodes = new ArrayList<Node>();
+
+
+		// for every subnet create nodes
+
+		int nodeid = 0;
+
+		for(int subnet = 0; subnet<nsubnet; subnet++)
+		{
+			for(int nodeindex=0; nodeindex<nodesinsubnet[subnet]; nodeindex++)
+			{
+				int nodeval = randInt(nodevaluerange[0], nodevaluerange[1]);
+				int defcost = randInt(defcostrange[0], defcostrange[1]);
+				int defcostnoise = randInt(0, defendercostnoise);
+				int attcostnoise = randInt(0, attackercostnoise);
+				int attackercost = randInt(attackercostrange[0], attackercostrange[1]);
+				Node node = new Node(nodeid, subnet, nodeval, attackercost+attcostnoise, defcost+defcostnoise);
+				nodes.add(node);
+				nodeid++;
+			}
+		}
+		
+		
+		edges = new ArrayList<ArrayList<Edge>>();
+		
+		for (int n=0; n<numberofnodes; n++)
+		{
+			edges.add(new ArrayList<Edge>());
+		}
+
+		// now make the intra subnet connections
+
+		for(int subnet=0; subnet<nsubnet; subnet++)
+		{
+			HashMap<Integer, Node> subnetnodes = getSubNetNodes(nodes, subnet);
+
+
+			int nedge = randInt(intrasubnetnumberofedgerange[1], intrasubnetnumberofedgerange[1]);
+
+			//int edgepernode = (int)Math.ceil(nedge/nodesinsubnet[subnet]);
+
+			int totaledgedone = 0;
+			ArrayList<int[]> donedges = new ArrayList<int[]>();
+
+			
+
+			for(Node n: subnetnodes.values())
+			{
+				int nodeedgecount = 0; 
+
+				ArrayList<Node> notdonenodes = new ArrayList<Node>();
+
+				for(Node t: subnetnodes.values())
+				{
+					if(t.nodeId != n.nodeId)
+					{
+						notdonenodes.add(t);
+					}
+				}
+
+				// prob used for a subnet
+
+
+				while(true)
+				{
+					// pick another node randomly
+
+					int index = -1;
+
+					if(notdonenodes.size()>0)
+					{
+						index = randInt(0, notdonenodes.size()-1);
+
+						Node nei = notdonenodes.get(index);
+
+						boolean isok = isOK(n, nei, donedges);
+
+						if(isok)
+						{
+
+							double prob = randInt(intrasubtransmissionprob[0], intrasubtransmissionprob[1])/100.0;
+							//n.addNeighbor(nei);
+							
+							double probnoise = randInt(0, (int)intrasubtransmissionprobnoise)/100.0;
+							//n.setTransitionProbs(nei, prob-probnoise);
+							
+							edges.get(n.nodeId).add(new Edge(n.nodeId, nei.nodeId, prob-probnoise));
+							
+
+							//nei.addNeighbor(n);
+							//nei.setTransitionProbs(n, prob-probnoise);
+
+
+							nodeedgecount++;
+							totaledgedone++;
+
+							int [] e = {n.nodeId, nei.nodeId};
+							donedges.add(e);
+							notdonenodes.remove(index);
+						}
+						else
+						{
+							notdonenodes.remove(index);
+						}
+					}
+					else
+					{
+						break;
+					}
+
+
+
+					if(totaledgedone==nedge)
+						break;
+				}
+			}
+
+			if(totaledgedone<nedge)
+			{
+				for(Node n: subnetnodes.values())
+				{
+
+					while(true)
+					{
+						// pick another node randomly
+
+
+						for(Node nei: subnetnodes.values())
+						{
+							if(nei.nodeId != n.nodeId)
+							{
+
+								boolean isok = isOK(n, nei, donedges);
+								if(isok)
+								{
+									double prob = randInt(intrasubtransmissionprob[0], intrasubtransmissionprob[1])/100.0;
+									//n.addNeighbor(nei);
+									double probnoise = randInt(0, (int)intrasubtransmissionprobnoise)/100.0;
+									//n.setTransitionProbs(nei, prob-probnoise);
+									
+									edges.get(n.nodeId).add(new Edge(n.nodeId, nei.nodeId, prob-probnoise));
+
+									//nei.addNeighbor(n);
+									//nei.setTransitionProbs(n, prob-probnoise);
+									totaledgedone++;
+
+									int [] e = {n.nodeId, nei.nodeId};
+									donedges.add(e);
+									break;
+								}
+							}
+
+						}
+						if(totaledgedone==nedge)
+							break;
+					}
+				}
+			}
+
+
+
+		}
+
+
+		if(connectsubnets)
+		{
+
+			for(int subnet1=0; subnet1<nsubnet-1; subnet1++)
+			{
+				for(int subnet2=subnet1+1; subnet2<nsubnet; subnet2++)
+				{
+
+					if(subnet1 != subnet2)
+					{
+						HashMap<Integer, Node> subnet1nodes = getSubNetNodes(nodes, subnet1);
+						HashMap<Integer, Node> subnet2nodes = getSubNetNodes(nodes, subnet2);
+
+
+
+						ArrayList<Integer> s1nodes = new ArrayList<Integer>(subnet1nodes.keySet());
+						ArrayList<Integer> s2nodes = new ArrayList<Integer>(subnet2nodes.keySet());
+
+
+
+						int nedge = randInt(intersubnetnumberofedgerange[0], intersubnetnumberofedgerange[1]);
+
+
+						int edgecount = 0;
+
+						ArrayList<int[]> done = new ArrayList<int[]>();
+
+
+						if(nedge>0)
+						{
+
+							while(true)
+							{
+
+								// pick two nodes randomly from two subnet and add them... 
+								// add prob
+
+								int index1 = randInt(0, s1nodes.size()-1);
+								int index2 = randInt(0, s2nodes.size()-1);
+
+								int n1 = s1nodes.get(index1);
+								int  n2 = s2nodes.get(index2);
+
+								boolean ok = isOK(n1, n2, done);
+
+								if(ok)
+								{
+									Node n1node = subnet1nodes.get(n1);
+									Node n2node = subnet2nodes.get(n2);
+
+
+									double prob = randInt(intersubtransmissionprob[0], intersubtransmissionprob[0])/100.0;
+
+									/*n1node.addNeighbor(n2node);
+									n1node.setTransitionProbs(n2node, prob);
+
+
+									n2node.addNeighbor(n1node);
+									n2node.setTransitionProbs(n1node, prob);*/
+									
+									edges.get(n1node.nodeId).add(new Edge(n1node.nodeId, n2node.nodeId, prob));
+									
+
+									int[] e = {n1, n2};
+
+									done.add(e);
+
+									edgecount++;
+								}
+
+
+								if(edgecount==nedge)
+									break;
+							} // end while loop
+						}
+
+
+					}
+				}
+			}
+
+
+		}
+
+
+
+
+
+		//return nodes;
+
+
+
+	}
+	
+	
+	private static boolean isOK(int n1, int n2, ArrayList<int[]> done) {
+
+		for(int[] e: done)
+		{
+			if((e[0]==n1 && e[1]==n2) || (e[1]==n1 && e[0]==n2))
+				return false;
+		}
+
+
+		return true;
+	}
+	
+	
+	private static boolean isOK(Node n, Node nei, ArrayList<int[]> donedges) {
+
+
+
+		for(int[] e: donedges)
+		{
+			if((e[0]==n.nodeId && e[1]==nei.nodeId) || (e[1]==n.nodeId && e[0]==nei.nodeId))
+				return false;
+		}
+
+
+		return true;
+	}
+	
+	
+	private static HashMap<Integer, Node> getSubNetNodes(ArrayList<Node> nodes, int subnet) {
+
+
+		HashMap<Integer, Node> subnodes = new HashMap<Integer, Node>();
+
+
+		for(Node n: nodes)
+		{
+			if(n.subnet==subnet)
+			{
+				subnodes.put(n.nodeId, n);
+			}
+		}
+
+		return subnodes;
+
+	}
+	
 
 	public ArrayList<Node> cloneNodes(ArrayList<Node> nodes){
 		ArrayList<Node> newNodes = new ArrayList<Node>();
@@ -119,7 +469,8 @@ public class Simulator {
 
 				double defSum = 0.0;
 				double atkSum = 0.0;
-				for(int i = 0; i < 10000; i++){
+				for(int i = 0; i < 10000; i++)
+				{
 					boolean[] controlled = Subnetwork.simulate(nodes, edges, atkMove, defMove);
 					for(int j = 0; j < controlled.length; j++)
 					{
@@ -142,6 +493,61 @@ public class Simulator {
 				defenderPayoff += defAvg;
 				attackerPayoff += atkAvg;
 				//System.out.println("Expected of (" + defMove + "," + atkMove + "): " + "(" + defenderPayoff + "," + attackerPayoff + ")");
+				System.out.print(defenderPayoff + "," +attackerPayoff +" ");
+				if(atkMove < nodes.size()-1)
+					System.out.print("\t");
+			}
+			System.out.println();
+		}
+	}
+	
+	
+	public void simulateMonteCarlo(HashMap<String,Double> defenderpayoffs, HashMap<String,Double> attackerpayoffs){
+		
+		for(int defMove = 0; defMove < nodes.size(); defMove++)
+		{
+			for(int atkMove = 0; atkMove < nodes.size(); atkMove++)
+			{
+				ArrayList<Node> nodes = cloneNodes(this.nodes);
+				//nodes.get(defMove).value = 0.0 - nodes.get(defMove).value;
+				//nodes.get(defMove).value /= 2.0;
+				ArrayList<ArrayList<Edge>> edges = hardenNetwork(this.edges, defMove);
+
+				double defenderPayoff = -nodes.get(defMove).defenderCost; //Start with cost
+				double attackerPayoff = -nodes.get(atkMove).attackerCost; //Start with cost
+
+				double defSum = 0.0;
+				double atkSum = 0.0;
+				for(int i = 0; i < 10000; i++)
+				{
+					boolean[] controlled = Subnetwork.simulate(nodes, edges, atkMove, defMove);
+					for(int j = 0; j < controlled.length; j++)
+					{
+						if(controlled[j] == true)
+							defSum -= nodes.get(j).value;
+					}
+					if(controlled[defMove] == false)
+					{
+						for(int j = 0; j < controlled.length; j++)
+						{
+							if(controlled[j] == true && (j!= defMove))
+								atkSum += nodes.get(j).value;
+						}
+					}
+					//atkSum += nodes.get(defMove).value;
+					//sum += Subnetwork.simulate(nodes, edges, atkMove);
+				}
+				double defAvg = defSum / 10000.00;
+				double atkAvg = atkSum / 10000.00;
+				defenderPayoff += defAvg;
+				attackerPayoff += atkAvg;
+				//System.out.println("Expected of (" + defMove + "," + atkMove + "): " + "(" + defenderPayoff + "," + attackerPayoff + ")");
+				
+				String key = defMove + ","+atkMove;
+
+				attackerpayoffs.put(key, atkAvg);
+				defenderpayoffs.put(key, defAvg);
+				
 				System.out.print(defenderPayoff + "," +attackerPayoff +" ");
 				if(atkMove < nodes.size()-1)
 					System.out.print("\t");
