@@ -76,7 +76,7 @@ public class SubNet {
 	private static void doMonteCarloSimulation(HashMap<Integer, NodeX> nodes, HashMap<String,Double> defenderpayoffs, HashMap<String,Double> attackerpayoffs) {
 
 
-		int LIMIT = 10000;
+		int LIMIT = 1000;
 
 		/*HashMap<String, Double> attackerpayoffs = new  HashMap<String, Double>();
 		HashMap<String, Double> defenderpayoffs = new  HashMap<String, Double>();*/
@@ -245,6 +245,87 @@ public class SubNet {
 
 			}
 		}
+
+
+
+	}
+	
+	
+	private static void doMonteCarloSimulationParallel(HashMap<Integer, NodeX> nodes, HashMap<String,Double> defenderpayoffs, HashMap<String,Double> attackerpayoffs) throws InterruptedException {
+
+
+		int LIMIT = 6000;
+
+		/*HashMap<String, Double> attackerpayoffs = new  HashMap<String, Double>();
+		HashMap<String, Double> defenderpayoffs = new  HashMap<String, Double>();*/
+
+		
+		
+		
+		MonteCarloParallel mc[] = new MonteCarloParallel[nodes.size()*nodes.size()];
+
+		int cellindex = 0;
+		
+		for(NodeX hardendenode : nodes.values())
+		{
+			
+
+			for(NodeX attackednode: nodes.values())
+			{
+				
+				Random rand = new Random();
+
+				mc[cellindex] = new MonteCarloParallel(rand, hardendenode.id+","+attackednode.id, LIMIT, hardendenode, attackednode, nodes);
+				mc[cellindex].start();
+				cellindex++;
+
+			}
+		}
+		
+		
+        cellindex = 0;
+		
+		for(NodeX hardendenode : nodes.values())
+		{
+			for(NodeX attackednode: nodes.values())
+			{
+				
+				mc[cellindex].t.join();
+				cellindex++;
+			}
+		}
+		
+		cellindex = 0;
+		
+		for(NodeX hardendenode : nodes.values())
+		{
+			
+
+			for(NodeX attackednode: nodes.values())
+			{
+				// harden the defended node
+
+
+				double sumatt = mc[cellindex].sumatt;
+				double sumdef = mc[cellindex].sumdef;
+				cellindex++;
+
+				sumatt /= LIMIT;
+				sumdef /= LIMIT;
+
+				System.out.println("("+hardendenode.id + ","+ attackednode.id+ ") = " + sumatt);
+
+				String key = hardendenode.id + ","+attackednode.id;
+
+				attackerpayoffs.put(key, sumatt);
+				defenderpayoffs.put(key, sumdef);
+
+
+			}
+		}
+		
+		
+		
 
 
 
@@ -1250,7 +1331,7 @@ public class SubNet {
 
 		// do the exp
 
-		GameReductionBySubGame.transmissionExp(ITER_LIMIT, naction, nplayer, ncluster);
+		GameReductionBySubGame.transmissionExp(ITER_LIMIT, naction, nplayer, ncluster, 160);
 
 
 	}
@@ -1379,10 +1460,11 @@ public class SubNet {
 
 
 		int ITER_LIMIT = 1;
-		naction = 100;
+		int ITER_SUBGAME = 160;
+		naction = 25;
 		int nplayer = 2;
-		ncluster = 10;
-		boolean connectsubnets = false;
+		ncluster = 5;
+		boolean connectsubnets = true;
 		// set up the game parameters before experiments
 		buildExperimentGames(ITER_LIMIT, naction, nplayer, ncluster, connectsubnets);
 
@@ -1390,7 +1472,7 @@ public class SubNet {
 		GameReductionBySubGame.deltaExp(nplayer, ncluster, naction, ITER_LIMIT);
 		
 		
-		GameReductionBySubGame.transmissionExp(ITER_LIMIT, naction, nplayer, ncluster);
+		GameReductionBySubGame.transmissionExp(ITER_LIMIT, naction, nplayer, ncluster, ITER_SUBGAME);
 
 
 	}
@@ -1411,13 +1493,13 @@ public class SubNet {
 		GameReductionBySubGame.deltaExp(nplayer, ncluster, naction, ITER_LIMIT);
 		
 		
-		GameReductionBySubGame.transmissionExp(ITER_LIMIT, naction, nplayer, ncluster);
+		GameReductionBySubGame.transmissionExp(ITER_LIMIT, naction, nplayer, ncluster, 160);
 
 
 	}
 	
 	
-	public static void buildExperimentGames(int ITER_LIMIT, int naction2, int nplayer, int ncluster, boolean connectsubnets) throws FileNotFoundException
+	public static void buildExperimentGames(int ITER_LIMIT, int naction2, int nplayer, int ncluster, boolean connectsubnets) throws FileNotFoundException, InterruptedException
 	{
 		// create game files
 
@@ -1467,7 +1549,7 @@ public class SubNet {
 
 			HashMap<String, Double> attackerpayoffs = new  HashMap<String, Double>();
 			HashMap<String, Double> defenderpayoffs = new  HashMap<String, Double>();
-			doMonteCarloSimulation(nodes, defenderpayoffs, attackerpayoffs);
+			doMonteCarloSimulationParallel(nodes, defenderpayoffs, attackerpayoffs);
 			buildGameFile(naction, defenderpayoffs, attackerpayoffs, naction[0], iter, ncluster);
 		}
 

@@ -189,7 +189,7 @@ public class SolverCombo {
 			else if(x==3) // QRE
 			{
 
-				QRESolver qre = new QRESolver();
+				QRESolver qre = new QRESolver(100);
 				EmpiricalMatrixGame emg = new EmpiricalMatrixGame(abstractgame);
 				qre.setDecisionMode(QRESolver.DecisionMode.RAW);
 				for(int i=0; i< abstractgame.getNumPlayers(); i++ )

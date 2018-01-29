@@ -732,6 +732,10 @@ public class Main {
 			int ncluster = 0;//Integer.parseInt(args[1]);
 			
 			
+			/*int naction = Integer.parseInt(args[0]);
+			int ncluster = Integer.parseInt(args[1]);*/
+			
+			
 			SubNet.deltaExp(naction, ncluster);
 			//SubNet.deltaExpV2(naction, ncluster);
 			

@@ -32,6 +32,7 @@ import solvers.QRESolver;
 import solvers.SolverCombo;
 import solvers.SolverExperiments;
 import solvers.SolverUtils;
+import subgamesolver.SubGameSolver;
 
 
 
@@ -373,7 +374,7 @@ public class GameReductionBySubGame {
 	 * @param gameindex
 	 * @return true if either of the strategy is positive
 	 */
-	private static boolean needToSolve(int gameindex) 
+	public static boolean needToSolve(int gameindex) 
 	{
 
 
@@ -1093,8 +1094,12 @@ public class GameReductionBySubGame {
 
 		//	int subgame = 0;
 		int players = originalgame.getNumPlayers();
+		
 		ArrayList<MixedStrategy> player1strategies = new ArrayList<MixedStrategy>();
 		ArrayList<MixedStrategy> player2strategies = new ArrayList<MixedStrategy>();
+		
+		
+		
 		Date start = new Date();
 		long l1 = start.getTime();
 		int subgamegameindex = 0;
@@ -1245,6 +1250,86 @@ public class GameReductionBySubGame {
 			player2strategies.add(subgameprofile[1]);
 			subgamegameindex++;
 		}
+		Date stop = new Date();
+		long l2 = stop.getTime();
+		long diff = l2 - l1;
+		GameReductionBySubGame.subgamesolvingtime += diff;
+		GameReductionBySubGame.subgamesolvingcounter++;
+
+		if( (GameReductionBySubGame.numberofsubgames != player1strategies.size()) || (GameReductionBySubGame.numberofsubgames != player2strategies.size()))
+		{
+			try {
+				throw new Exception("Error in subgame");
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		GameReductionBySubGame.subgamestrategy.clear();
+		GameReductionBySubGame.subgamestrategy.add(player1strategies);
+		GameReductionBySubGame.subgamestrategy.add(player2strategies);
+		GameReductionBySubGame.prevsubgamestrategy.clear();
+		//always saves previous round's subgame strategy
+		GameReductionBySubGame.prevsubgamestrategy.add(player1strategies);
+		GameReductionBySubGame.prevsubgamestrategy.add(player2strategies);
+
+	}
+	
+	
+	
+	public static void  solveSubGamesParallel(int iteration) throws Exception
+	{
+
+		//	int subgame = 0;
+		int players = originalgame.getNumPlayers();
+		
+		ArrayList<MixedStrategy> player1strategies = new ArrayList<MixedStrategy>();
+		ArrayList<MixedStrategy> player2strategies = new ArrayList<MixedStrategy>();
+		
+		
+		
+		Date start = new Date();
+		long l1 = start.getTime();
+		int subgamegameindex = 0;
+		
+		
+		SubGameSolver[] sgsolver = new SubGameSolver[GameReductionBySubGame.subgames.size()];
+		
+		for(MatrixGame subgamex: GameReductionBySubGame.subgames)
+		{
+			
+			
+			sgsolver[subgamegameindex] = new SubGameSolver(subgamex, iteration, subgamegameindex, "SubgameThread-"+subgamegameindex); 
+			sgsolver[subgamegameindex].start();
+			
+			
+			
+			//player1strategies.add(subgameprofile[0]);
+			//player2strategies.add(subgameprofile[1]);
+			subgamegameindex++;
+		}
+		
+		
+		subgamegameindex = 0;
+		for(MatrixGame subgamex: GameReductionBySubGame.subgames)
+		{
+			sgsolver[subgamegameindex].getT().join();
+			subgamegameindex++;
+		}
+		
+		
+		subgamegameindex = 0;
+		for(MatrixGame subgamex: GameReductionBySubGame.subgames)
+		{
+			
+			player1strategies.add(subgamegameindex,sgsolver[subgamegameindex].subgameprofile[0]);
+			player2strategies.add(subgamegameindex,sgsolver[subgamegameindex].subgameprofile[1]);
+			subgamegameindex++;
+		}
+		
+		
+		
+		
 		Date stop = new Date();
 		long l2 = stop.getTime();
 		long diff = l2 - l1;
@@ -3316,7 +3401,7 @@ public class GameReductionBySubGame {
 
 
 
-	public static void transmissionExp(int iTER_LIMIT, int naction, int nplayer, int ncluster) throws Exception
+	public static void transmissionExp(int iTER_LIMIT, int naction, int nplayer, int ncluster, int ITER_SUBGAME) throws Exception
 	{
 		/*
 		 * first test games are built
@@ -3358,9 +3443,13 @@ public class GameReductionBySubGame {
 		 * now do test
 		 */
 		int ITERATION = 1;
+		
 		double sumlpsneepsilon = 0;
 		double sumlmebepsilon = 0;
 		double sumlqreepsilon = 0;
+		
+		
+		//int ITER_SUBGAME = 100;
 		//double sum
 		double sumdelta = 0;
 
@@ -3425,7 +3514,7 @@ public class GameReductionBySubGame {
 			Double oldepsilon = -1.0;
 
 			int lastiter = -1; 
-			for(int iteration = 0;iteration<160; iteration++)
+			for(int iteration = 0;iteration<ITER_SUBGAME; iteration++)
 			{
 				/*
 				 * copy new strategies to old ones. 
@@ -3554,7 +3643,7 @@ public class GameReductionBySubGame {
 			 * fill the rest of the iteration
 			 */
 
-			for(int pp=lastiter+1; pp<160; pp++)
+			for(int pp=lastiter+1; pp<ITER_SUBGAME; pp++)
 			{
 				eps[pp] += minimumepsilonyet;
 			}
@@ -3637,7 +3726,7 @@ public class GameReductionBySubGame {
 		//calculateTimes(totaltimesubgame, totalsubgametimecounter, "totalsubgamemethod");
 
 		calculateTimes(GameReductionBySubGame.subgamesolvingtime, GameReductionBySubGame.subgamesolvingcounter,"subgame");
-		//calculateTimes(GameReductionBySubGame.hierarchicalsolvingtime, GameReductionBySubGame.hierarchicalsolvingcounter,"hierarchical");
+		calculateTimes(GameReductionBySubGame.hierarchicalsolvingtime, GameReductionBySubGame.hierarchicalsolvingcounter,"hierarchical");
 		calculateTimes(GameReductionBySubGame.psnetimer, GameReductionBySubGame.psnetimecounter,"psne");
 		calculateTimes(GameReductionBySubGame.mebtimer, GameReductionBySubGame.mebtimecounter,"meb");
 		calculateTimes(GameReductionBySubGame.qretimer, GameReductionBySubGame.qretimecounter,"qre");
