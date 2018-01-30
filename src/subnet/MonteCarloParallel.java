@@ -7,27 +7,30 @@ import java.util.PriorityQueue;
 import java.util.Random;
 
 public class MonteCarloParallel implements Runnable{
-	
-	
-	
+
+
+
 	Random rand = new Random();
 	public double sumatt = 0.0;
 	public double sumdef = 0.0;		
-	
+
 	public Thread t;
-	 public String threadName;
-	 public int LIMIT;
-	 public NodeX hardendenode;
-	 public NodeX attackednode;
-	 
-	 public HashMap<Integer, NodeX> nodes = new HashMap<Integer, NodeX>();
-	 
-	 
-	 
-	 
-	 
-	 
-	 
+	public String threadName;
+	public int LIMIT;
+	public NodeX hardendenode;
+	public NodeX attackednode;
+
+	public HashMap<Integer, NodeX> nodes = new HashMap<Integer, NodeX>();
+
+	public boolean suspend = true;
+	public boolean waiting = false;
+
+
+
+
+
+
+
 
 	public MonteCarloParallel(Random rand, String threadName, int iTER, NodeX hardendenode, NodeX attackednode, HashMap<Integer, NodeX> nodes) {
 		super();
@@ -41,7 +44,7 @@ public class MonteCarloParallel implements Runnable{
 
 	@Override
 	public void run() {
-		
+
 		for(int iter = 0; iter<=LIMIT; iter++)
 		{
 
@@ -143,7 +146,7 @@ public class MonteCarloParallel implements Runnable{
 							beta = 0.5;
 							gamma = 0.5;
 						}
-						
+
 
 						double prob = curorignode.getTransitionProbs(nei);
 						// generate a random double
@@ -177,12 +180,12 @@ public class MonteCarloParallel implements Runnable{
 
 
 		}
+
+
 		
-		
-		
-		
+
 	}
-	
+
 	public void start () 
 	{
 		System.out.println("Starting " +  threadName );

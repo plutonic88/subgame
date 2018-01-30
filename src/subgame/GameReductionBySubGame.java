@@ -1173,18 +1173,18 @@ public class GameReductionBySubGame {
 						 * Use PSNE first, see if  e==0,
 						 * if not then do IED and QRE
 						 */
-						int psnesolver = 0; // psne
+						/*int psnesolver = 0; // psne
 						MixedStrategy[] subgamepsne =  SolverCombo.computeStrategyWithOneSolver(psnesolver, subgamex);
 						ArrayList<MixedStrategy> list = new ArrayList<MixedStrategy>();
 						list.add(subgamepsne[0]);
 						list.add(subgamepsne[1]);
 						OutcomeDistribution distro = new OutcomeDistribution(list);
-						double epsilonpsne = SolverUtils.computeOutcomeStability(subgamex, distro);
-						//double epsilonpsne = 5;
+						double epsilonpsne = SolverUtils.computeOutcomeStability(subgamex, distro);*/
+						double epsilonpsne = 5;
 						if(epsilonpsne<=0)
 						{
-							subgameprofile[0] = new MixedStrategy(subgamepsne[0].getProbs()) ;
-							subgameprofile[1] = new MixedStrategy(subgamepsne[1].getProbs());
+							//subgameprofile[0] = new MixedStrategy(subgamepsne[0].getProbs()) ;
+							//subgameprofile[1] = new MixedStrategy(subgamepsne[1].getProbs());
 						}
 						else if(epsilonpsne>0)
 						{
@@ -3475,7 +3475,7 @@ public class GameReductionBySubGame {
 
 			GameReductionBySubGame.setIsfirstiteration(true);
 			gmr.setOriginalgame(tstgame);
-			printgame(tstgame, gamenumber);
+			//printgame(tstgame, gamenumber);
 
 			makeDeepCopyPartition(allparitions.get(0), GameReductionBySubGame.partition);
 
@@ -4185,7 +4185,7 @@ public class GameReductionBySubGame {
 		{
 
 
-			PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+"time.csv"),true));
+			PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+solvertype+"-"+"time.csv"),true));
 			// gamenumber, subgame, psne, meb,qre
 			//pw.append(solvertype+","+elapsedMinutes+"."+elapsedSeconds+"\n");
 			pw.append(solvertype+","+time+"\n");
