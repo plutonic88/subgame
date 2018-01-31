@@ -275,15 +275,15 @@ public class SubNet {
 			for(NodeX attackednode: nodes.values())
 			{
 
-				
+
 				double [] payoffs = getPayoffsBySimulation(hardendenode, attackednode, nodes, LIMIT/4);
-				
-				
+
+
 				double sumdef = payoffs[0];
 				double sumatt = payoffs[1];
-				
-				
-				
+
+
+
 
 				sumatt /= LIMIT;
 				sumdef /= LIMIT;
@@ -297,12 +297,12 @@ public class SubNet {
 
 			}
 		}
-		
-		
 
 
 
-		
+
+
+
 
 
 
@@ -487,39 +487,39 @@ public class SubNet {
 
 	private static double[] getPayoffsBySimulation(NodeX hardendenode, NodeX attackednode,
 			HashMap<Integer, NodeX> nodes, int lIMIT) throws InterruptedException {
-		
+
 		Random rand = new Random();
 
 		MonteCarloParallel thrd1 = new MonteCarloParallel(rand, hardendenode.id+","+attackednode.id, lIMIT, hardendenode, attackednode, nodes);
 		thrd1.start();
-		
+
 		MonteCarloParallel thrd2 = new MonteCarloParallel(rand, hardendenode.id+","+attackednode.id, lIMIT, hardendenode, attackednode, nodes);
 		thrd2.start();
-		
+
 		MonteCarloParallel thrd3 = new MonteCarloParallel(rand, hardendenode.id+","+attackednode.id, lIMIT, hardendenode, attackednode, nodes);
 		thrd3.start();
-		
+
 		MonteCarloParallel thrd4 = new MonteCarloParallel(rand, hardendenode.id+","+attackednode.id, lIMIT, hardendenode, attackednode, nodes);
 		thrd4.start();
-		
-		
+
+
 		thrd1.t.join();
 		thrd2.t.join();
 		thrd3.t.join();
 		thrd4.t.join();
-		
-		
+
+
 		double sumattackr = thrd1.sumatt + thrd2.sumatt + thrd3.sumatt + thrd4.sumatt;
 		double sumdefender = thrd1.sumdef + thrd2.sumdef + thrd3.sumdef + thrd4.sumdef;
-		
+
 		return new double[] {sumdefender, sumattackr};
-		
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
+
 	}
 
 
@@ -1475,20 +1475,29 @@ public class SubNet {
 	public static void deltaExp(int naction, int ncluster) throws Exception {
 
 
-		int ITER_LIMIT = 1;
+		int ITER_LIMIT = 2;
 		int ITER_SUBGAME = 160;
-		naction = 100;
+
 		int nplayer = 2;
+		naction = 150;
 		ncluster = 5;
+
+
 		boolean connectsubnets = true;
+
+
+		//int[] ncl = {3,4,5,6,7,8,9,10,12};
+		//int nac[]= {200, 300};
 		// set up the game parameters before experiments
-		buildExperimentGames(ITER_LIMIT, naction, nplayer, ncluster, connectsubnets);
 
-
-		GameReductionBySubGame.deltaExp(nplayer, ncluster, naction, ITER_LIMIT);
-
-
-		GameReductionBySubGame.transmissionExp(ITER_LIMIT, naction, nplayer, ncluster, ITER_SUBGAME);
+		/*for(int ac: nac)
+		{
+			naction = ac;
+			ncluster = 5;*/
+			buildExperimentGames(ITER_LIMIT, naction, nplayer, ncluster, connectsubnets);
+			GameReductionBySubGame.deltaExp(nplayer, ncluster, naction, ITER_LIMIT);
+			GameReductionBySubGame.transmissionExp(ITER_LIMIT, naction, nplayer, ncluster, ITER_SUBGAME);
+		//}
 
 
 	}
@@ -1526,7 +1535,7 @@ public class SubNet {
 		int nsubnet = ncluster;
 		int numberofnodes = naction2;
 		int nodesinsubnet[] = new int[nsubnet];
-		int intrasubtransmissionprob[] = {20, 40}; //make this 2d
+		int intrasubtransmissionprob[] = {70, 100}; //make this 2d
 		double intrasubtransmissionprobnoise = 0;
 		int intersubtransmissionprob[] = {10, 30}; // make this 2d/3d
 		double intersubtransmissionprobnoise = 0; // no need
