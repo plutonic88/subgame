@@ -1475,11 +1475,11 @@ public class SubNet {
 	public static void deltaExp(int naction, int ncluster) throws Exception {
 
 
-		int ITER_LIMIT = 2;
+		int ITER_LIMIT = 3;
 		int ITER_SUBGAME = 160;
 
 		int nplayer = 2;
-		naction = 150;
+		naction = 200;
 		ncluster = 5;
 
 
@@ -1494,7 +1494,7 @@ public class SubNet {
 		{
 			naction = ac;
 			ncluster = 5;*/
-			buildExperimentGames(ITER_LIMIT, naction, nplayer, ncluster, connectsubnets);
+			//buildExperimentGames(ITER_LIMIT, naction, nplayer, ncluster, connectsubnets);
 			GameReductionBySubGame.deltaExp(nplayer, ncluster, naction, ITER_LIMIT);
 			GameReductionBySubGame.transmissionExp(ITER_LIMIT, naction, nplayer, ncluster, ITER_SUBGAME);
 		//}
@@ -1507,12 +1507,12 @@ public class SubNet {
 
 
 		int ITER_LIMIT = 1;
-		naction = 9;
+		naction = 25;
 		int nplayer = 2;
-		ncluster = 3;
+		ncluster = 5;
 		boolean connectsubnets = false;
 		// set up the game parameters before experiments
-		buildExperimentGamesV2(ITER_LIMIT, naction, nplayer, ncluster, connectsubnets);
+		//buildExperimentGamesV2(ITER_LIMIT, naction, nplayer, ncluster, connectsubnets);
 
 
 		GameReductionBySubGame.deltaExp(nplayer, ncluster, naction, ITER_LIMIT);

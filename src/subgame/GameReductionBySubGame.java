@@ -3401,7 +3401,7 @@ public class GameReductionBySubGame {
 
 
 
-	public static void transmissionExp(int iTER_LIMIT, int naction, int nplayer, int ncluster, int ITER_SUBGAME) throws Exception
+	public static void transmissionExp(int ITER_LIMIT, int naction, int nplayer, int ncluster, int ITER_SUBGAME) throws Exception
 	{
 		/*
 		 * first test games are built
@@ -3412,7 +3412,7 @@ public class GameReductionBySubGame {
 		int numberofaction = naction;
 		double delta = 0;
 		double margin = 1; // margin to include best responses for the graph for louvain method
-		int totalgames = iTER_LIMIT;//3
+		int totalgames = ITER_LIMIT;//3
 		List<Integer>[][] dummypartition = new List[numberofplayers][];
 		List<List<Integer>[][]> allparitions = new ArrayList<List<Integer>[][]>();
 		for(int i=0; i< dummypartition.length; i++)
@@ -3558,11 +3558,11 @@ public class GameReductionBySubGame {
 
 				try
 				{
-					//PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+"itr_result"+".csv"),true));
+					PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+"itr_result"+".csv"),true));
 					eps[iteration] += minimumepsilonyet;
 					lastiter = iteration;
-					//pw.append("\n"+iteration+","+minimumepsilonyet);
-					//pw.close();
+					pw.append("\n"+iteration+","+minimumepsilonyet);
+					pw.close();
 
 				}
 				catch(Exception e)
@@ -3646,7 +3646,17 @@ public class GameReductionBySubGame {
 			for(int pp=lastiter+1; pp<ITER_SUBGAME; pp++)
 			{
 				eps[pp] += minimumepsilonyet;
+				
+				
+				
+				
+				
 			}
+			
+			
+			
+			
+			
 
 			/*
 			 * find the strategy with minimum epsilon
@@ -3712,10 +3722,28 @@ public class GameReductionBySubGame {
 
 
 		}
+		
+		
+		for(int i=0; i<ITER_SUBGAME; i++)
+		{
+			try
+			{
+				PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+"itr_epsilon-"+numberofaction+".csv"),true));
+				
+				double d = eps[i]/ITER_LIMIT;
+				pw.append("\n"+i+","+d);
+				pw.close();
+
+			}
+			catch(Exception e)
+			{
+
+			}
+		}
 
 
 
-		sumdelta /= iTER_LIMIT;
+		sumdelta /= ITER_LIMIT;
 
 
 		if(GameReductionBySubGame.subgamesolvingcounter != GameReductionBySubGame.hierarchicalsolvingcounter)
