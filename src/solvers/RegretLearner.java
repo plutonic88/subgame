@@ -333,6 +333,7 @@ public class RegretLearner
 			OutcomeDistribution origregretdistro = new OutcomeDistribution(originalstrategylist);
 			double regretepsilon = SolverUtils.computeOutcomeStability(matrixgame, origregretdistro);
 			repetition_counter++;
+			System.out.println("iter "+ repetition_counter);
 		}
 		MixedStrategy[] ultimatestrategy = getUltimateStrategy(sumofstrategy, repeptition_limit);
 		List<MixedStrategy> originalstrategylist = new ArrayList<MixedStrategy>();

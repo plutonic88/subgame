@@ -736,7 +736,12 @@ public class Main {
 			int ncluster = Integer.parseInt(args[1]);*/
 			
 			
-			SubNet.deltaExp(naction, ncluster);
+			
+			//GameReductionBySubGame.testSubGameSolverV3();
+			GameReductionBySubGame.testSubGameVSOrigSolving();
+			
+			
+			//SubNet.deltaExp(naction, ncluster);
 			//SubNet.deltaExpV2(naction, ncluster);
 			
 			

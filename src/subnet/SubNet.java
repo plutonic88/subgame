@@ -13,8 +13,14 @@ import java.util.Random;
 
 import javax.swing.plaf.SliderUI;
 
+import games.EmpiricalMatrixGame;
 import games.MatrixGame;
+import games.MixedStrategy;
+import games.OutcomeIterator;
 import output.SimpleOutput;
+import parsers.GamutParser;
+import solvers.QRESolver;
+import solvers.RegretLearner;
 import subgame.GameReductionBySubGame;
 import subgame.Parameters;
 import subnetmarcus.Node;
@@ -1475,11 +1481,11 @@ public class SubNet {
 	public static void deltaExp(int naction, int ncluster) throws Exception {
 
 
-		int ITER_LIMIT = 3;
+		int ITER_LIMIT = 5;
 		int ITER_SUBGAME = 160;
 
 		int nplayer = 2;
-		naction = 200;
+		naction = 50;
 		ncluster = 5;
 
 
@@ -1495,12 +1501,84 @@ public class SubNet {
 			naction = ac;
 			ncluster = 5;*/
 			//buildExperimentGames(ITER_LIMIT, naction, nplayer, ncluster, connectsubnets);
-			GameReductionBySubGame.deltaExp(nplayer, ncluster, naction, ITER_LIMIT);
+			//GameReductionBySubGame.deltaExp(nplayer, ncluster, naction, ITER_LIMIT);
 			GameReductionBySubGame.transmissionExp(ITER_LIMIT, naction, nplayer, ncluster, ITER_SUBGAME);
+			//solveGameQRE();
 		//}
 
 
 	}
+
+
+	private static void solveGameQRE() {
+		
+		MatrixGame tstgame = new MatrixGame(GamutParser.readGamutGame(Parameters.GAME_FILES_PATH+"100-10-0.gamut"));
+		
+		
+		writeGamutGame(tstgame);
+		
+		
+		MixedStrategy [] abstractgamestrategy = new MixedStrategy[2];
+		abstractgamestrategy = RegretLearner.solveGame(tstgame);
+		
+		
+		QRESolver qre = new QRESolver(100);
+		EmpiricalMatrixGame emg = new EmpiricalMatrixGame(tstgame);
+		qre.setDecisionMode(QRESolver.DecisionMode.RAW);
+		for(int i=0; i< tstgame.getNumPlayers(); i++ )
+		{
+			abstractgamestrategy[i] = qre.solveGame(emg, i);
+		}
+		
+		
+		int x=1;
+		
+		
+	}
+
+
+
+	private static void writeGamutGame(MatrixGame tstgame) {
+		
+		
+		
+		
+		
+		try
+		{
+
+
+			PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+"100-10-0.nfg"),true));
+			// gamenumber, subgame, psne, meb,qre
+			pw.append("NFG 1 R \"Selten (IJGT, 75), Figure 2, normal form\""+"\n");
+			pw.append("{ \"Player 1\" \"Player 2\" } { 100 100 }"+ "\n\n");
+			
+			OutcomeIterator itr = tstgame.iterator();
+			
+			while(itr.hasNext())
+			{
+				int outcome[] = itr.next();
+				double[] payoff = tstgame.getPayoffs(outcome);
+				int x = (int)payoff[0];
+				int y = (int)payoff[1];
+				pw.append(x + " " + y + " ");
+				
+			}
+			
+			
+			
+			
+			pw.close();
+		}
+		catch(Exception ex){
+			//System.out.println("Gamereductionclass class :something went terribly wrong during file writing ");
+		}
+		
+		
+		
+		
+	}
+
 
 
 	public static void deltaExpV2(int naction, int ncluster) throws Exception {

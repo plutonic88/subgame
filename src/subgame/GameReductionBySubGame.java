@@ -1253,8 +1253,8 @@ public class GameReductionBySubGame {
 		Date stop = new Date();
 		long l2 = stop.getTime();
 		long diff = l2 - l1;
-		GameReductionBySubGame.subgamesolvingtime += diff;
-		GameReductionBySubGame.subgamesolvingcounter++;
+		GameReductionBySubGame.subgamesolvingtime += (diff/GameReductionBySubGame.subgames.size());
+		//GameReductionBySubGame.subgamesolvingcounter++;
 
 		if( (GameReductionBySubGame.numberofsubgames != player1strategies.size()) || (GameReductionBySubGame.numberofsubgames != player2strategies.size()))
 		{
@@ -1575,7 +1575,7 @@ public class GameReductionBySubGame {
 		GameReductionBySubGame.reducedgamestrategy.clear();
 		GameReductionBySubGame.reducedgamestrategy.add(reducedgamestrategy);
 		GameReductionBySubGame.hierarchicalsolvingtime += diff;
-		GameReductionBySubGame.hierarchicalsolvingcounter++;
+		//GameReductionBySubGame.hierarchicalsolvingcounter++;
 		MixedStrategy[] subgamestrategy = GameReductionBySubGame.buidMixedStrategyForOriginalGame(); 
 		for(int j =0; j< reducedgame.getNumPlayers(); j++)
 		{
@@ -2532,7 +2532,447 @@ public class GameReductionBySubGame {
 
 	}
 
+	/**
+	 * this method performs test on subgame solution technique and QRE, PSNE,MEB
+	 * 
+	 * @throws Exception
+	 */
+	public static void testSubGameVSOrigSolving() throws Exception
+	{
+		/*
+		 * first test games are built
+		 */
+		int numberofplayers = 2;
+		int numberofcluster = 5;
+		
+		int numberofaction = 25;
+		int totalgames = 10;
+		double delta = 0;
+		
+		
+		
+		
+		int limit_comsize=10;
+		double margin = 1; // margin to include best responses for the graph for louvain method
+		//3
+		List<Integer>[][] dummypartition = new List[numberofplayers][];
+		for(int i=0; i< dummypartition.length; i++)
+		{
+			dummypartition[i] = new List[numberofcluster];
+		}
+		for(int i=0; i< 2; i++)
+		{
 
+			for(int j =0; j< numberofcluster; j++)
+			{
+				dummypartition[i][j] = new ArrayList<Integer>(); 
+			}
+		}
+		createRandomPartition(numberofcluster, numberofaction, dummypartition);
+		/*
+		 * create a predefined partition
+		 */
+
+		/*for(int i=0; i<2; i++)
+		{
+
+			if(i==0)
+			{
+				dummypartition[i][0].add(1);
+				dummypartition[i][0].add(2);
+				//dummypartition[i][0].add(7);
+				dummypartition[i][1].add(3);
+				dummypartition[i][1].add(4);
+				//dummypartition[i][1].add(9);
+				dummypartition[i][2].add(5);
+				dummypartition[i][2].add(6);
+				//dummypartition[i][2].add(8);
+
+
+
+			}
+			else
+			{
+				dummypartition[i][0].add(1);
+				dummypartition[i][0].add(2);
+				//dummypartition[i][0].add(9);
+				dummypartition[i][1].add(3);
+				dummypartition[i][1].add(4);
+				//dummypartition[i][1].add(8);
+				dummypartition[i][2].add(5);
+				dummypartition[i][2].add(6);
+				//dummypartition[i][2].add(7);
+			}
+
+		}
+		 */
+
+		GameReductionBySubGame gmr = new GameReductionBySubGame(dummypartition, numberofcluster, null, numberofaction);
+		buildtestgame = true;
+		int size = numberofaction;
+
+		if(GameReductionBySubGame.buildtestgame== true)
+		{
+			createTestGames(numberofaction, numberofcluster, numberofplayers, totalgames, size, delta, dummypartition);
+
+		} // end of if
+		/*
+		 * test games are built. partitions are stored.
+		 * now do test
+		 */
+		int ITERATION = 1;
+		double sumlpsneepsilon = 0;
+		double sumlmebepsilon = 0;
+		double sumlqreepsilon = 0;
+		//double sum
+
+
+		double sumsubgameepsilon = 0;
+		double sumqreepsilon = 0;
+		double sumpsneepsilon = 0;
+		double summebepsilon = 0;
+		resetTimerParameters();
+		long totaltimesubgame = 0;
+		int totalsubgametimecounter = 0;
+		double[] eps = new double[160];
+		long louviantime = 0;
+		long louvainclustertime = 0;
+		long kmeantime = 0;
+		for(int gamenumber = 0; gamenumber < totalgames; gamenumber++)
+		{
+			MatrixGame tstgame = new MatrixGame(GamutParser.readGamutGame(Parameters.GAME_FILES_PATH+gamenumber+Parameters.GAMUT_GAME_EXTENSION));
+			GameReductionBySubGame.setIsfirstiteration(true);
+			gmr.setOriginalgame(tstgame);
+			//printgame(tstgame, gamenumber);
+
+
+
+			/**
+			 * copy partition from louvain method
+			 */
+
+			makeDeepCopyPartition(GameReductionBySubGame.paritionsforgames.get(gamenumber), GameReductionBySubGame.partition);
+			//System.out.println("doing louvain, game "+ gamenumber + "...");
+			System.out.println("NUmber of subgames "+ GameReductionBySubGame.numberofsubgames);
+			Date start = new Date();
+			long l1 = start.getTime();
+
+			//List<Integer>[][] tmppartition = LouvainClusteringActions.getLouvainClustering(tstgame, numberofcluster, margin); 
+			//List<Integer>[][] tmppartition = LouvainClusteringActions.getFixedLouvainClustering(tstgame, numberofcluster, margin, limit_comsize);
+			//List<Integer>[][] tmppartition = SolverExperiments.getKmeanCLusters(numberofcluster, tstgame, true); 
+
+
+			Date stop = new Date();
+			long l2 = stop.getTime();
+			long diff = l2 - l1;
+			louvainclustertime += diff;
+			GameReductionBySubGame.numberofsubgames = GameReductionBySubGame.partition[0].length;
+			//makeDeepCopyPartition(tmppartition, GameReductionBySubGame.partition);
+
+			//System.out.println("NUmber of subgames "+ GameReductionBySubGame.numberofsubgames);
+
+			/////////////////////////////////////////
+
+
+
+
+			ArrayList<MixedStrategy[]> finalstrategies = new ArrayList<MixedStrategy[]>();
+			GameReductionBySubGame.finalstrategy[0].setUniform();
+			GameReductionBySubGame.finalstrategy[1].setUniform();
+			/*
+			 * create a hashmap to save all the strategies and all the epsilon
+			 */
+			HashMap<Integer,MixedStrategy[]> strategycontainer = new HashMap<Integer,MixedStrategy[]>();
+			HashMap<Integer,Double> epsiloncontainer = new HashMap<Integer,Double>();
+			Double minimumepsilonyet = Double.MAX_VALUE;
+			Double oldepsilon = -1.0;
+
+			int lastiter = -1; 
+			for(int iteration = 0;iteration<160; iteration++)
+			{
+				/*
+				 * copy new strategies to old ones. 
+				 * 
+				 */
+				copyNewStrategies(GameReductionBySubGame.finalstrategy, GameReductionBySubGame.oldfinalstrategy);
+				double epsilon = -1;
+				// send the epsilon from the last iteration, need it for support monitoring
+				start = new Date();
+				l1 = start.getTime();
+				if(iteration>0)
+				{
+					double lastiterationepsilon = epsiloncontainer.get(iteration-1);
+					if(oldepsilon != lastiterationepsilon)
+					{
+						throw new Exception();
+					}
+					epsilon = gmr.startProcessingV3(gamenumber, iteration, epsiloncontainer.get(iteration-1));
+				}
+				else
+				{	
+					epsilon = gmr.startProcessingV3(gamenumber, iteration, -1);
+				}
+				stop = new Date();
+				l2 = stop.getTime();
+				diff = l2 - l1;
+				totaltimesubgame += diff;
+				totalsubgametimecounter++;
+
+				louviantime += (diff+louvainclustertime);
+
+
+				oldepsilon = epsilon;
+
+				if(minimumepsilonyet>epsilon)
+				{
+					minimumepsilonyet = epsilon;
+				}
+				/*
+				 * print the epsilon for iterations
+				 */
+
+				try
+				{
+					//PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+"itr_result"+".csv"),true));
+					eps[iteration] += minimumepsilonyet;
+					lastiter = iteration;
+					//pw.append("\n"+iteration+","+minimumepsilonyet);
+					//pw.close();
+
+				}
+				catch(Exception e)
+				{
+
+				}
+
+				//test
+				epsiloncontainer.put(iteration, epsilon);
+				if(epsilon==0)
+				{
+					MixedStrategy[] tmpstr = new MixedStrategy[2];
+					tmpstr[0] = new MixedStrategy(finalstrategy[0].getProbs());
+					tmpstr[1] = new MixedStrategy(finalstrategy[1].getProbs());
+					strategycontainer.put(iteration, tmpstr);
+					epsiloncontainer.put(iteration, epsilon);
+					lastiter = iteration;
+					break;
+
+				}
+				System.out.println("Epsilon: "+ epsilon);
+				/*
+				 * check if the new strategy changed
+				 */
+				boolean changed = checkIfNewStrategyChanged(GameReductionBySubGame.finalstrategy, GameReductionBySubGame.oldfinalstrategy);
+				if(iteration>0 && (changed != true))
+				{
+
+					MixedStrategy[] tmpstr = new MixedStrategy[2];
+					tmpstr[0] = new MixedStrategy(finalstrategy[0].getProbs());
+					tmpstr[1] = new MixedStrategy(finalstrategy[1].getProbs());
+					strategycontainer.put(iteration, tmpstr);
+					epsiloncontainer.put(iteration, epsilon);
+					lastiter = iteration;
+					break;
+				}
+				/*
+				 * check if any repetition occured
+				 */
+
+
+				if(finalstrategies.size()==0)
+				{
+					MixedStrategy[] tmpstr = new MixedStrategy[2];
+					tmpstr[0] = new MixedStrategy(finalstrategy[0].getProbs());
+					tmpstr[1] = new MixedStrategy(finalstrategy[1].getProbs());
+					finalstrategies.add(tmpstr);
+					strategycontainer.put(iteration, tmpstr);
+					epsiloncontainer.put(iteration, epsilon);
+				}
+				else
+				{
+					/*
+					 * check for repetition.
+					 */
+					boolean repeat = checkForRepetition(finalstrategies, finalstrategy);
+					if(repeat==false)
+					{
+						MixedStrategy[] tmpstr = new MixedStrategy[2];
+						tmpstr[0] = new MixedStrategy(finalstrategy[0].getProbs());
+						tmpstr[1] = new MixedStrategy(finalstrategy[1].getProbs());
+						finalstrategies.add(tmpstr);
+						strategycontainer.put(iteration, tmpstr);
+						epsiloncontainer.put(iteration, epsilon);
+					}
+					else
+					{
+						lastiter = iteration;
+						break;
+					}
+				}
+
+
+
+			}
+			
+			GameReductionBySubGame.hierarchicalsolvingcounter++;
+			GameReductionBySubGame.subgamesolvingcounter++;
+
+			/**
+			 * fill the rest of the iteration
+			 */
+
+			for(int pp=lastiter+1; pp<160; pp++)
+			{
+				eps[pp] += minimumepsilonyet;
+			}
+
+			/*
+			 * find the strategy with minimum epsilon
+			 */
+			Double minepsilon = getMinEpsilon(epsiloncontainer);
+			//double qreeps = gmr.solveUsingQRE();
+			sumsubgameepsilon += minepsilon;
+
+
+			int solvers[] = {0,2,3};
+			/*ArrayList<Double> luvainwithothers = doLouvainWithOthers(tmppartition, tstgame, solvers);
+			//double res[] = new double[luvainwithothers.size()];
+			int c =0;
+			for(Double x: luvainwithothers)
+			{
+				//res[c++]= x;
+				if(c==0)
+				{
+					sumlpsneepsilon += x;
+				}
+				else if(c==1)
+				{
+					sumlmebepsilon += x;
+				}
+				else if(c==2)
+				{
+					sumlqreepsilon+= x;
+				}
+				c++;
+
+
+			}*/
+
+
+			/**
+			 * add an solver for the original game
+			 */
+			
+			
+			
+			
+			
+
+
+
+			/**
+			 * use other solvers with clustering to find stability
+			 * 0.PSNE
+			 * 1.CFR
+			 * 2.MEB
+			 * 3.QRE
+			 */
+
+
+			double[][] result = SolverExperiments.evaluateSolutionConcepts(GameReductionBySubGame.numberofsubgames, tstgame, Integer.toString(gamenumber) , true, solvers, 100);
+			//	System.out.println("\nDone doing evaluating solution concepts ");
+
+			//System.out.println(louviantime+","+ kmeantimer + ", "+ psnetimer+","+mebtimer+","+qretimer);
+
+
+			for(int j=0; j<result.length; j++)
+			{
+				if(j==0)
+				{
+					sumpsneepsilon = sumpsneepsilon + result[j][1];
+				}
+				else if(j==1)
+				{
+					summebepsilon += result[j][1];
+				}
+				else if(j==2)
+				{
+					sumqreepsilon += result[j][1];
+				}
+				//Logger.log("\n Running Instance "+ i+ " player "+ j + " delta: "+ result[j][0]+ " epsilon: "+result[j][1], false);
+
+			}
+
+
+
+
+			try
+			{
+
+
+				PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+"iter-result.csv"),true));
+				// gamenumber, subgame, psne, meb,qre
+				pw.append(gamenumber+","+minepsilon+","+result[0][1]+","+result[1][1]+","+result[2][1]+"\n");
+				pw.close();
+			}
+			catch(Exception ex){
+				System.out.println("Gamereductionclass class :something went terribly wrong during file writing ");
+			}
+
+			//System.out.println("QRE Epsilon: "+ qreeps);
+
+
+		}
+
+		
+
+		if(GameReductionBySubGame.subgamesolvingcounter != GameReductionBySubGame.hierarchicalsolvingcounter)
+		{
+			throw new Exception("error in timer counter");
+		}
+
+		//calculateTimes(totaltimesubgame, totalsubgametimecounter, "totalsubgamemethod");
+
+		calculateTimes(GameReductionBySubGame.subgamesolvingtime, GameReductionBySubGame.subgamesolvingcounter,"subgame");
+		calculateTimes(GameReductionBySubGame.hierarchicalsolvingtime, GameReductionBySubGame.hierarchicalsolvingcounter,"hierarchical");
+		calculateTimes(GameReductionBySubGame.hierarchicalsolvingtime+GameReductionBySubGame.subgamesolvingtime, GameReductionBySubGame.hierarchicalsolvingcounter,"ISASC");
+		
+		calculateTimes(GameReductionBySubGame.psnetimer, GameReductionBySubGame.psnetimecounter,"psne");
+		calculateTimes(GameReductionBySubGame.mebtimer, GameReductionBySubGame.mebtimecounter,"meb");
+		calculateTimes(GameReductionBySubGame.qretimer, GameReductionBySubGame.qretimecounter,"qre");
+		 
+
+		
+
+		System.out.println(delta+","+ sumsubgameepsilon/totalgames+","+ 
+				/*sumlpsneepsilon/totalgames+ "," + sumlmebepsilon/totalgames+","+ sumlqreepsilon/totalgames+","*/
+				+sumpsneepsilon/totalgames+","+summebepsilon/totalgames+","+sumqreepsilon/totalgames );
+		
+		
+		
+		try
+		{
+
+
+			PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+"full-result.csv"),true));
+			// gamenumber, subgame, psne, meb,qre
+			pw.append(delta+","+sumsubgameepsilon/totalgames+","+sumpsneepsilon/totalgames+","+summebepsilon/totalgames+","+sumqreepsilon/totalgames+"\n");
+			pw.close();
+		}
+		catch(Exception ex){
+			System.out.println("Gamereductionclass class :something went terribly wrong during file writing ");
+		}
+
+		
+		System.out.println(delta+","+ 
+
+
+				+
+				(GameReductionBySubGame.kmeantimer+(GameReductionBySubGame.psnetimer))/totalgames+","+
+				(GameReductionBySubGame.kmeantimer+(GameReductionBySubGame.mebtimer))/totalgames+","+
+				(GameReductionBySubGame.kmeantimer+(GameReductionBySubGame.qretimer))/totalgames );
+
+	}
 
 
 	/**
@@ -2617,7 +3057,7 @@ public class GameReductionBySubGame {
 		 * test games are built. partitions are stored.
 		 * now do test
 		 */
-		int ITERATION = 1;
+		int ITERATION = 10;
 		double sumlpsneepsilon = 0;
 		double sumlmebepsilon = 0;
 		double sumlqreepsilon = 0;
@@ -3468,6 +3908,7 @@ public class GameReductionBySubGame {
 		{
 			MatrixGame tstgame = new MatrixGame(GamutParser.readGamutGame(Parameters.GAME_FILES_PATH+numberofaction+"-"+numberofcluster+"-"+gamenumber+Parameters.GAMUT_GAME_EXTENSION));
 
+			//MatrixGame tstgame = new MatrixGame(GamutParser.readGamutGame(Parameters.GAME_FILES_PATH+"3-2-0"+Parameters.GAMUT_GAME_EXTENSION));
 
 
 
@@ -3478,6 +3919,12 @@ public class GameReductionBySubGame {
 			//printgame(tstgame, gamenumber);
 
 			makeDeepCopyPartition(allparitions.get(0), GameReductionBySubGame.partition);
+			
+			//GameReductionBySubGame.partition[0][1].add(3);
+			//GameReductionBySubGame.partition[1][1].add(3);
+			
+			
+			
 
 			double tmpdelta = computeDelta(tstgame, GameReductionBySubGame.partition);
 
@@ -4213,7 +4660,7 @@ public class GameReductionBySubGame {
 		{
 
 
-			PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+solvertype+"-"+"time.csv"),true));
+			PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+"time.csv"),true));
 			// gamenumber, subgame, psne, meb,qre
 			//pw.append(solvertype+","+elapsedMinutes+"."+elapsedSeconds+"\n");
 			pw.append(solvertype+","+time+"\n");

@@ -8,13 +8,13 @@ public class Parameters {
   // base path to storage location of generated game instances
   //public static final String GAME_FILES_PATH = "/home/ckiekint/IdeaProjects/EmpiricalGameAnalysis/game_files/";
   //public static final String GAME_FILES_PATH = "C:\\Users\\Oscar-XPS\\Documents\\game\\game_files\\";
-  public static final String GAME_FILES_PATH = "/Users/anjonsunny/eclipse-workspace/subgame/result/";
+  public static final String GAME_FILES_PATH = "/Users/anjonsunny/eclipse-workspace/subgame/";
     //public static final String GAME_FILES_PATH = "";
 
   // base path to the directory where results should be stored
   //public static final String RESULTS_PATH = "/home/ckiekint/IdeaProjects/EmpiricalGameAnalysis/results/";
   //public static final String RESULTS_PATH = "C:\\Users\\Oscar-XPS\\Documents\\game\\results\\";
-  public static final String RESULTS_PATH = "/Users/anjonsunny/eclipse-workspace/subgame/result/";
+  public static final String RESULTS_PATH = "/Users/anjonsunny/eclipse-workspace/subgame/";
 
   // path to the gamut jar file
   //public static final String GAMUT_PATH = "/home/ckiekint/projects/gamut/gamut.jar";

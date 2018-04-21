@@ -470,8 +470,260 @@ public class KmeanClustering {
 
 
 	}
+	
+	
+	public static List<Double>[] clusterUsers(int numberofclusters, double[][] examples)
+	{
+		int numberofexamples = examples.length;
+		//int opponent = 1^player;
+		//final int   RUNNING_FOR = 20;
+		//int[] numberofactions = mg.getNumActions();
+		//double[] extreampayoffs = mg.getExtremePayoffs();
+		int INDEX_LIMIT = examples[0].length;
+		List<Double[]>[] clusters = new List[numberofclusters]; // create an array of list. Each list will contain arrays of double
+		double[][] clusterpoints = new double[numberofclusters][INDEX_LIMIT];  // cluster points for each cluster
+		double[][] oldclusterpoints = new double[numberofclusters][INDEX_LIMIT];  
+		double[][] distancefromcluster = new double[numberofclusters][INDEX_LIMIT];
+		int runningInstance = 0;
+		//double[] sumofdifferences = new double[numberofclusters];  //store the sum of differences for clusters
+		//double[] maxdifference = new double[numberofclusters]; 
+		double[] squaredrootdifference = new double[numberofclusters];
+		ArrayList<Integer> alreadyassignedactions = new ArrayList<Integer>(); // for random partition method
+		//boolean flagforrandompartition = false;
+		for(int i=0; i< numberofclusters; i++)
+		{
+			clusters[i] = new ArrayList<Double[]>(); 
+		}
+		if(KmeanClustering.isRandPointsFromObservation()) // implemented only for two players
+		{
+			ArrayList<Integer> unassignedpoints = new ArrayList<Integer>();
+			int targetindex = 0;
+			for(int i=0; i<numberofexamples; i++)
+			{
+				unassignedpoints.add(i);
+			}
+			for(int i=0; i< numberofclusters; i++)
+			{
+				targetindex = randInt(0, unassignedpoints.size()-1);
+				int tmptarget = unassignedpoints.get(targetindex);
+				unassignedpoints.remove(targetindex);
+				int index = 0;
+				while(index<INDEX_LIMIT)
+				{
+					clusterpoints[i][index] = examples[tmptarget][index];
+					index++;
+				}
+			}
+			//System.out.println("Initial cluster points...");
+			for(int i =0; i< numberofclusters; i++)
+			{
+				//System.out.print("Cluster: "+ i + " ");
+				for(int j =0; j< INDEX_LIMIT; j++)
+				{
+					//System.out.print(" "+clusterpoints[i][j]); 
+				}
+				//System.out.print("\n");
+				
+			}
+		}
+		while(true)
+		{
+			//System.out.println("\nIteration: "+ runningInstance);
+			
+			if(runningInstance>=100)
+			{
+				List<Double>[] finalcluster = new List[numberofclusters];
+				for(int i=0; i< numberofclusters; i++){
+
+					finalcluster[i] = new ArrayList<Double>(); 
+				}
+				for(int i=0; i<numberofclusters; i++)
+				{
+					for(Double[] x: clusters[i])
+					{
+						finalcluster[i].add(x[0]);
+					}
+				}
+				return finalcluster;
+			}
+			//copy the cluster points to old cluster points.
+			for(int i=0; i< numberofclusters; i++)
+			{
+				for(int j=0; j<INDEX_LIMIT; j++)
+				{
+					oldclusterpoints[i][j] = clusterpoints[i][j];
+				}
+			}
+			// now clear/create e cluster object the new cluster for a new iteration. 
+			for(int i=0; i< numberofclusters; i++)
+			{
+				clusters[i]= new ArrayList<Double[]>(); //.clear();
+			}
+			/*
+			 * Now iterate over all the possible action touples for player 1. 
+			 * calclate the difference from cluster points
+			 * assign to the cluster with the minimum difference.
+			 *  
+			 */
+			for(int target = 0; target < numberofexamples; target++)
+			{
+				for(int rewardindex = 0; rewardindex < INDEX_LIMIT; rewardindex++)
+				{
+
+					double tmppayoff = examples[target][rewardindex]; //mg.getPayoff(outcome, player); //get the payoff for player 1 or player 2
+					for(int clusterindex =0; clusterindex<numberofclusters; clusterindex++)
+					{
+						/*
+						 * calculate the differences of payoffs for each cluster points 
+						 * calculate euclidean distance: first take the squares of difference....
+						 */
+						if(KmeanClustering.isDistMetricEuclidean())
+						{
+							//	Logger.log("\n entered DistMetricEuclidean() ", false);
+							distancefromcluster[clusterindex][rewardindex] = (clusterpoints[clusterindex][rewardindex]  - (tmppayoff));
+							distancefromcluster[clusterindex][rewardindex] = distancefromcluster[clusterindex][rewardindex] * distancefromcluster[clusterindex][rewardindex];
+						}
+					}
+				}
+				double min = Double.POSITIVE_INFINITY;
+				int minindex = 0;
+				if(KmeanClustering.isDistMetricEuclidean())
+				{
+					/*
+					 * find the squared root distances
+					 */
+					for(int l =0; l< numberofclusters; l++)
+					{
+						squaredrootdifference[l] = 0;
+						for(int m =0; m< distancefromcluster[l].length; m++)
+						{
+							squaredrootdifference[l] += distancefromcluster[l][m];
+						}
+						squaredrootdifference[l] = Math.sqrt(squaredrootdifference[l]);
+						//int a = target+1;
+						//System.out.println("\n Target "+ target+"'s euclidean distance from cluster "+ l+ " : "+squaredrootdifference[l]);
+					}
+					// find the minimum squared root distance
+					for(int n =0; n< squaredrootdifference.length; n++)
+					{
+						if(min > squaredrootdifference[n])
+						{
+							min = squaredrootdifference[n];
+							minindex = n;
+						}
+					}
+
+				}
+				/*
+				 * 
+				 * assign the action i+1 to minindex cluster
+				 */
+				//System.out.println("\nIteration: "+ runningInstance + " \n Assigning cluster points ");
+				//System.out.println("target "+target +" is assigned to cluster "+ minindex);
+				assignToCluster(clusters, target, minindex, examples, INDEX_LIMIT);
+
+			}  // end of outer for loop
+			/*
+			 * now recalculate the cluster points
+			 */
+			
+			//System.out.println("Clustered Targets : " );
+			for(int i=0; i< clusters.length; i++)
+			{
+				//System.out.print("Cluster " + i + " : ");
+				for(Double[] target: clusters[i])
+				{
+					//System.out.print(target[0]);
+					if(clusters[i].indexOf(target) < (clusters[i].size()-1) )
+					{
+						//System.out.print(",");
+					}
+				}
+				//System.out.print("\n");
+			}
+			
+			
+			
+			
+
+			calculateClusterMeanD(clusters, clusterpoints, numberofclusters, examples, INDEX_LIMIT);
+			//System.out.println("\n\nIteration: "+ runningInstance + " ");
+			//System.out.println("\n\nK-mean Iteration: "+ runningInstance  +" new cluster points(mean)\n");
+			for(int i =0; i< numberofclusters; i++)
+			{
+
+				//System.out.print("Cluster: "+ i + " ");
+				//Logger.log("Cluster: "+ i + " ", false);
+				for(int j =0; j< INDEX_LIMIT; j++)
+				{
+
+					//System.out.print(" "+clusterpoints[i][j]); 
+					//Logger.log(" "+clusterpoints[i][j], false);
+
+				}
+				//System.out.print("\n");
+				//Logger.log("\n", false);
+			}
+			//System.out.println("Checking or stop ");
+			boolean checkforstop = true;
+			for(int i=0; i< numberofclusters; i++)
+			{
+
+				for(int j=0; j<INDEX_LIMIT; j++)
+				{
+					if(clusterpoints[i][j] != oldclusterpoints[i][j])
+					{
+						checkforstop = false;
+						break;
+					}
+				}
+				if(checkforstop==false)
+				{
+					break;
+				}
+			}
+
+			//System.out.println("\nIteration: "+ runningInstance + "Checking exit condition ");
+			if(checkforstop == true && (!isClusterIsEmptyD(clusters)))
+			{
+				//System.out.println("\n Exiting..." );
+				break;
+			}
+			//Logger.log("\n\n", false);
+			runningInstance++;
+
+
+
+		}//end of outer while loop
+		List<Double>[] finalcluster = new List[numberofclusters];
+		for(int i=0; i< numberofclusters; i++){
+
+			finalcluster[i] = new ArrayList<Double>(); 
+		}
+		for(int i=0; i<numberofclusters; i++)
+		{
+			for(Double[] x: clusters[i])
+			{
+				finalcluster[i].add(x[0]);
+			}
+		}
+
+		return finalcluster;
+
+
+	}
 
 	private static boolean isClusterIsEmpty(List<Integer[]>[] clusters) {
+		for(int i=0; i<clusters.length; i++)
+		{
+			if(clusters[i].size()==0)
+				return true;
+		}
+
+		return false;
+	}
+	
+	private static boolean isClusterIsEmptyD(List<Double[]>[] clusters) {
 		for(int i=0; i<clusters.length; i++)
 		{
 			if(clusters[i].size()==0)
@@ -543,6 +795,70 @@ public class KmeanClustering {
 		}
 
 	}
+	
+	
+	/**
+	 * calculates cluster mean for security games
+	 * @param clusters
+	 * @param clusterpoints
+	 * @param numberofclusters
+	 * @param gamedata
+	 */
+	private static void calculateClusterMeanD(List<Double[]>[] clusters,
+			double[][] clusterpoints, int numberofclusters, double[][] gamedata, int INDEX_LIMIT) {
+
+		/*
+
+		 * now recalculate the cluster mean
+
+		 */
+		//int opponent = 1^player;
+		double average = 0;
+		for(int clusterindex = 0; clusterindex< numberofclusters; clusterindex++)
+		{
+			int clustersize = clusters[clusterindex].size();
+			if(clustersize==0)
+			{
+				System.out.println("\n\nEmpty cluster: "+ clusterindex + " ");
+				int randomtarget;
+				while(true)
+				{
+					// if cluster is empty, assign random points from the strategy
+					randomtarget = randInt(0,gamedata.length-1 );
+					//check if the payoffs are same as centroid of another cluster
+					System.out.println(".....");
+					break;
+
+				}
+				Logger.log("\nAction "+ randomtarget+"'s payoffs are assigned to cluster "+ clusterindex, false);
+				for(int j =0; j<INDEX_LIMIT; j++)
+				{
+					double reward = gamedata[randomtarget][j];  //mg.getPayoff(outcome, player);
+					clusterpoints[clusterindex][j] = reward;
+				}
+				Logger.log("\n cluster: "+ clusterindex + " is empty, points after reassignment:\n", false);
+
+
+			}
+			else if(clustersize>0)
+			{
+				for(int rewardindex = 0; rewardindex< INDEX_LIMIT; rewardindex++)
+				{
+					average = 0;   // corrected, average should be reset after calculating for every action
+					for(Double[] x: clusters[clusterindex])
+					{
+						average += x[rewardindex+1]; 
+					}
+					if(clustersize != 0)
+					{
+						clusterpoints[clusterindex][rewardindex] = average/clustersize; 
+					}
+				}
+			}
+
+		}
+
+	}
 
 	/**
 	 * assigns targets to a cluster
@@ -559,6 +875,25 @@ public class KmeanClustering {
 		//int oppnumaction = mg.getNumActions(opponent);
 		Integer[] tupleincluster = new Integer[INDEX_LIMIT+1]; // +1 for the target
 		tupleincluster[0] = target; //the target in the first index
+		/*
+		 * now assign the rewards
+		 */
+		for(int p = 0; p<INDEX_LIMIT; p++)
+		{
+			tupleincluster[p+1] = gamedata[target][p]; //mg.getPayoff(tmpoutcome, player); 
+		}
+		clusters[assignedcluster].add(tupleincluster); 
+
+	}
+	
+	
+	private static void assignToCluster(List<Double[]>[] clusters, int target,
+			int assignedcluster, double[][] gamedata, int INDEX_LIMIT) {
+
+		//int opponent = 1^player;
+		//int oppnumaction = mg.getNumActions(opponent);
+		Double[] tupleincluster = new Double[INDEX_LIMIT+1]; // +1 for the target
+		tupleincluster[0] = (double)target; //the target in the first index
 		/*
 		 * now assign the rewards
 		 */
@@ -1259,6 +1594,9 @@ public class KmeanClustering {
 		}
 
 	}
+	
+	
+	
 
 
 
