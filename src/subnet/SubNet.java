@@ -1515,7 +1515,7 @@ public class SubNet {
 		MatrixGame tstgame = new MatrixGame(GamutParser.readGamutGame(Parameters.GAME_FILES_PATH+"100-10-0.gamut"));
 		
 		
-		writeGamutGame(tstgame);
+		writeGamutGame(tstgame, 0);
 		
 		
 		MixedStrategy [] abstractgamestrategy = new MixedStrategy[2];
@@ -1538,7 +1538,7 @@ public class SubNet {
 
 
 
-	private static void writeGamutGame(MatrixGame tstgame) {
+	public static void writeGamutGame(MatrixGame tstgame, int gamenumber) {
 		
 		
 		
@@ -1548,10 +1548,10 @@ public class SubNet {
 		{
 
 
-			PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+"100-10-0.nfg"),true));
+			PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+gamenumber+".nfg"),true));
 			// gamenumber, subgame, psne, meb,qre
 			pw.append("NFG 1 R \"Selten (IJGT, 75), Figure 2, normal form\""+"\n");
-			pw.append("{ \"Player 1\" \"Player 2\" } { 100 100 }"+ "\n\n");
+			pw.append("{ \"Player 1\" \"Player 2\" } { "+tstgame.getNumActions(0)+" "+ tstgame.getNumActions(0)+" }"+ "\n\n");
 			
 			OutcomeIterator itr = tstgame.iterator();
 			

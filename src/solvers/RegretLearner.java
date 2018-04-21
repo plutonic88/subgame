@@ -310,7 +310,7 @@ public class RegretLearner
 			sumofstrategy[j] = new double[matrixgame.getNumActions(j)];
 		}
 
-		int repeptition_limit = 200000;
+		int repeptition_limit = 50000;
 		int repetition_counter = 0;
 		while(repetition_counter<repeptition_limit)
 		{
@@ -333,7 +333,7 @@ public class RegretLearner
 			OutcomeDistribution origregretdistro = new OutcomeDistribution(originalstrategylist);
 			double regretepsilon = SolverUtils.computeOutcomeStability(matrixgame, origregretdistro);
 			repetition_counter++;
-			System.out.println("iter "+ repetition_counter);
+			//System.out.println("iter "+ repetition_counter);
 		}
 		MixedStrategy[] ultimatestrategy = getUltimateStrategy(sumofstrategy, repeptition_limit);
 		List<MixedStrategy> originalstrategylist = new ArrayList<MixedStrategy>();

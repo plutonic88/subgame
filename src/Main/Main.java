@@ -738,7 +738,8 @@ public class Main {
 			
 			
 			//GameReductionBySubGame.testSubGameSolverV3();
-			GameReductionBySubGame.testSubGameVSOrigSolving();
+			//GameReductionBySubGame.testSubGameVSOrigSolving();
+			GameReductionBySubGame.testDONFG();
 			
 			
 			//SubNet.deltaExp(naction, ncluster);

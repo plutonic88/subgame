@@ -61,6 +61,8 @@ public class SolverCombo {
 			}
 			else if(x==1) // CFR
 			{
+				Date start = new Date();
+				l1 = start.getTime();
 				abstractgamestrategy = RegretLearner.solveGame(abstractgame);
 
 			}
@@ -110,6 +112,14 @@ public class SolverCombo {
 				long diff = l2 - l1;
 				GameReductionBySubGame.psnetimer += diff ;
 				GameReductionBySubGame.psnetimecounter++;
+			}
+			else if(x==1) //cfr)
+			{
+				Date stop = new Date();
+				long l2 = stop.getTime();
+				long diff = l2 - l1;
+				GameReductionBySubGame.cfrtimer += diff ;
+				GameReductionBySubGame.cfrtimecounter++;
 			}
 			else if(x==2)
 			{
