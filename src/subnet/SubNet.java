@@ -1546,12 +1546,21 @@ public class SubNet {
 		
 		try
 		{
+			File file = new File(Parameters.GAME_FILES_PATH+gamenumber+".nfg");
 
+			if(file.delete())
+	        {
+	            System.out.println("File deleted successfully");
+	        }
+	        else
+	        {
+	            System.out.println("Failed to delete the file");
+	        }
 
-			PrintWriter pw = new PrintWriter(new FileOutputStream(new File(Parameters.GAME_FILES_PATH+gamenumber+".nfg"),true));
+			PrintWriter pw = new PrintWriter(new FileOutputStream(file,true));
 			// gamenumber, subgame, psne, meb,qre
 			pw.append("NFG 1 R \"Selten (IJGT, 75), Figure 2, normal form\""+"\n");
-			pw.append("{ \"Player 1\" \"Player 2\" } { "+tstgame.getNumActions(0)+" "+ tstgame.getNumActions(0)+" }"+ "\n\n");
+			pw.append("{ \"Player 1\" \"Player 2\" } { "+tstgame.getNumActions(0)+" "+ tstgame.getNumActions(1)+" }"+ "\n\n");
 			
 			OutcomeIterator itr = tstgame.iterator();
 			

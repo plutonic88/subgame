@@ -1,0 +1,39 @@
+Number of players: 2
+Number of actions: 
+Player 1 : 100
+Player 2 : 100
+
+ 
+Number of clusters: 
+Player 1 : 10
+Player 2 : 10
+
+ 
+Mapping of actions: 
+
+Player 1 : 
+Cluster 1 Actions: 7, 22, 27, 38, 39, 56, 58, 59, 70, 83, 
+Cluster 2 Actions: 5, 9, 10, 15, 67, 79, 81, 91, 98, 100, 
+Cluster 3 Actions: 28, 
+Cluster 4 Actions: 3, 8, 13, 18, 20, 40, 54, 55, 73, 80, 
+Cluster 5 Actions: 1, 4, 17, 30, 32, 34, 41, 44, 48, 50, 53, 65, 66, 69, 71, 78, 90, 94, 95, 99, 
+Cluster 6 Actions: 19, 36, 49, 57, 60, 75, 77, 84, 88, 89, 
+Cluster 7 Actions: 14, 24, 26, 29, 33, 42, 43, 63, 74, 93, 
+Cluster 8 Actions: 2, 6, 12, 31, 52, 61, 68, 76, 92, 97, 
+Cluster 9 Actions: 16, 35, 45, 46, 51, 72, 86, 87, 96, 
+Cluster 10 Actions: 11, 21, 23, 25, 37, 47, 62, 64, 82, 85, 
+
+ 
+Player 2 : 
+Cluster 1 Actions: 14, 20, 34, 38, 49, 58, 70, 71, 87, 96, 
+Cluster 2 Actions: 6, 62, 63, 
+Cluster 3 Actions: 12, 19, 23, 33, 41, 43, 60, 65, 74, 79, 
+Cluster 4 Actions: 17, 18, 32, 46, 59, 68, 72, 92, 95, 100, 
+Cluster 5 Actions: 8, 16, 29, 61, 
+Cluster 6 Actions: 1, 5, 10, 27, 30, 37, 40, 42, 45, 47, 48, 50, 53, 56, 66, 81, 84, 85, 88, 97, 
+Cluster 7 Actions: 7, 13, 15, 21, 24, 25, 28, 36, 44, 52, 54, 55, 67, 69, 76, 78, 82, 83, 89, 91, 
+Cluster 8 Actions: 3, 9, 51, 57, 64, 75, 77, 86, 90, 93, 
+Cluster 9 Actions: 2, 4, 11, 26, 31, 35, 39, 80, 94, 98, 
+Cluster 10 Actions: 22, 73, 99, 
+
+ 
