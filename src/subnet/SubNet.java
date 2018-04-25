@@ -1546,7 +1546,7 @@ public class SubNet {
 		
 		try
 		{
-			File file = new File(Parameters.GAME_FILES_PATH+gamenumber+".nfg");
+			File file = new File(Parameters.GAME_FILES_PATH+"tmp/"+gamenumber+".nfg");
 
 			if(file.delete())
 	        {

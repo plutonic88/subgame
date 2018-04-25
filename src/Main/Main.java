@@ -738,7 +738,13 @@ public class Main {
 			
 			
 			//GameReductionBySubGame.testSubGameSolverV3();
-			GameReductionBySubGame.testSubGameVSOrigSolving();
+			//GameReductionBySubGame.testAllSolvers();
+			
+			int delta = 20;//Integer.parseInt(args[0]);
+			
+			GameReductionBySubGame.testISASCVSOrigSolvers(delta);
+			
+			// use logitqre
 			//GameReductionBySubGame.testOrigGameSolversNFG();
 			
 			//GameReductionBySubGame.testDO();

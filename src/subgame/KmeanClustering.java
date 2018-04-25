@@ -28,10 +28,10 @@ import util.GamutModifier;
 public class KmeanClustering {
 
 	private static  boolean RAND_POINTS_FROM_OBSERVATION = true; 
-	private static  boolean RAND_ACTION_INIT_TO_CLUSTERS = true;
-	private static  boolean DIST_METRIC_LINE = false; //used to create dir, if this is true, then other one is false, vice versa
-	private static  boolean DIST_METRIC_EUCLIDEAN =  true;
-	private static  boolean MAX_DIST = false;   //make it false if euclidean
+	private static  boolean RAND_ACTION_INIT_TO_CLUSTERS = false;
+	private static  boolean DIST_METRIC_LINE = true; //used to create dir, if this is true, then other one is false, vice versa
+	private static  boolean DIST_METRIC_EUCLIDEAN =  false;
+	private static  boolean MAX_DIST = true;   //make it false if euclidean
 	private static  final boolean SUM_DIST = false; //make it false if euclidean
 	private static  boolean MAX_DELTA = true; 
 	private static  boolean AVRG_DELTA = false;
