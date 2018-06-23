@@ -3288,7 +3288,7 @@ public class GameReductionBySubGame {
 		int numberofcluster = 10;
 		
 		int numberofaction = 100;
-		int totalgames = 10;
+		int totalgames = 20;
 		double delta = delta2;
 		
 		
@@ -3350,7 +3350,7 @@ public class GameReductionBySubGame {
 		 */
 
 		GameReductionBySubGame gmr = new GameReductionBySubGame(dummypartition, numberofcluster, null, numberofaction);
-		buildtestgame = true;
+		buildtestgame = false;
 		int size = numberofaction;
 
 		if(GameReductionBySubGame.buildtestgame== true)
@@ -3385,8 +3385,9 @@ public class GameReductionBySubGame {
 			/**
 			 * copy partition from louvain method
 			 */
-
-			makeDeepCopyPartition(GameReductionBySubGame.paritionsforgames.get(gamenumber), GameReductionBySubGame.partition);
+			//createPartition(numberofcluster, numberofaction, dummypartition);
+			//makeDeepCopyPartition(GameReductionBySubGame.paritionsforgames.get(gamenumber), GameReductionBySubGame.partition);
+			//makeDeepCopyPartition(dummypartition, GameReductionBySubGame.partition);
 			//System.out.println("doing louvain, game "+ gamenumber + "...");
 			System.out.println("NUmber of subgames "+ GameReductionBySubGame.numberofsubgames);
 			Date start = new Date();
@@ -3445,7 +3446,7 @@ public class GameReductionBySubGame {
 			l1 = start.getTime();
 			
 			//psne
-			sumpsneepsilon +=  PSNE(tstgame, gamenumber);
+			sumpsneepsilon +=  0;//PSNE(tstgame, gamenumber);
 			
 			stop = new Date();
 			 l2 = stop.getTime();
@@ -3477,19 +3478,19 @@ public class GameReductionBySubGame {
 			cfrtimer += diff;
 			
 
-
+			
 			
 			
 			start = new Date();
 			l1 = start.getTime();
 			
-			MixedStrategy[] origstrat = DO(tstgame, gamenumber);
+			solveUsingSimplSub(tstgame, gamenumber);//DO(tstgame, gamenumber);
 			stop = new Date();
 			 l2 = stop.getTime();
 			 diff = l2 - l1;
 			dotimer += diff;
 			
-			List<MixedStrategy> strategylist = new ArrayList<MixedStrategy>();
+			/*List<MixedStrategy> strategylist = new ArrayList<MixedStrategy>();
 			for(int i=0; i<origstrat.length; i++)
 			{
 				strategylist.add(origstrat[i]);
@@ -3497,7 +3498,7 @@ public class GameReductionBySubGame {
 			OutcomeDistribution origdistribution = new OutcomeDistribution(strategylist);
 			//double[]  originalpayoff = SolverUtils.computeOutcomePayoffs(tstgame, origdistribution);
 			double epsilon = SolverUtils.computeOutcomeStability(tstgame, origdistribution);
-			sumdoepsilon += epsilon;
+			sumdoepsilon += epsilon;*/
 			
 
 
@@ -3523,14 +3524,14 @@ public class GameReductionBySubGame {
 		//calculateTimes(GameReductionBySubGame.dohierarchicalsolvingtime+GameReductionBySubGame.dosubgamesolvingtime, GameReductionBySubGame.dohierarchicalsolvingcounter,"ISASCDO");
 		
 		
-		calculateTimes(GameReductionBySubGame.psnetimer/*+GameReductionBySubGame.kmeantimer*/, totalgames,"psne");
+		//calculateTimes(GameReductionBySubGame.psnetimer/*+GameReductionBySubGame.kmeantimer*/, totalgames,"psne");
 		
 		
-		calculateTimes(GameReductionBySubGame.qretimer/*+GameReductionBySubGame.kmeantimer*/, totalgames,"qre");
+		calculateTimes(GameReductionBySubGame.qretimer/*+GameReductionBySubGame.kmeantimer*/, totalgames,"QRE");
 		
 		//calculateTimes(GameReductionBySubGame.cfrtimer/*+GameReductionBySubGame.kmeantimer*/, totalgames,"cfr");
 		
-		calculateTimes(GameReductionBySubGame.dotimer,totalgames,"DO");
+		calculateTimes(GameReductionBySubGame.dotimer,totalgames,"SimplSub");
 		 
 
 		
@@ -3611,20 +3612,21 @@ public class GameReductionBySubGame {
 		/**
 		 * now solve the game using a solver
 		 */
-		EmpiricalMatrixGame empgm = new EmpiricalMatrixGame(tstgame);
+		//EmpiricalMatrixGame empgm = new EmpiricalMatrixGame(tstgame);
 	//	MixedStrategy[] tmpgmstrat = solveUsingQRE(empgm);
 		//MixedStrategy[] tmpgmstrat =  solveUsingSimplSub(tmpgm, gc);
-		MixedStrategy[] originalgamestrategy = solveUsingLogit(tstgame, gamenumber);
+		/*MixedStrategy[] originalgamestrategy = */
+		solveUsingLogitQRE(tstgame, gamenumber);
 		
 		
-		List<MixedStrategy> strategylist = new ArrayList<MixedStrategy>();
+		/*List<MixedStrategy> strategylist = new ArrayList<MixedStrategy>();
 		for(int i=0; i<originalgamestrategy.length; i++)
 		{
 			strategylist.add(originalgamestrategy[i]);
 		}
-		OutcomeDistribution origdistribution = new OutcomeDistribution(strategylist);
+		OutcomeDistribution origdistribution = new OutcomeDistribution(strategylist);*/
 		//double[]  originalpayoff = SolverUtils.computeOutcomePayoffs(tstgame, origdistribution);
-		double epsilon = SolverUtils.computeOutcomeStability(tstgame, origdistribution);
+		double epsilon = 0;//SolverUtils.computeOutcomeStability(tstgame, origdistribution);
 		
 		
 		
@@ -4206,11 +4208,12 @@ private static Double ISASCWithDO(MatrixGame tstgame, int gamenumber, GameReduct
 		else if(solver==1) // simpl
 		{
 			//MixedStrategy [] qregamestrategy = solveUsingLogit(tstgame, gamenumber);
-			MixedStrategy [] qregamestrategy = solveUsingSimplSub(tstgame, gamenumber);
+			/*MixedStrategy [] qregamestrategy = */
+			solveUsingSimplSub(tstgame, gamenumber);
 			
 			
 			
-			List<MixedStrategy> strategylist = new ArrayList<MixedStrategy>();
+			/*List<MixedStrategy> strategylist = new ArrayList<MixedStrategy>();
 			for(int i=0; i<qregamestrategy.length; i++)
 			{
 				strategylist.add(qregamestrategy[i]);
@@ -4219,9 +4222,9 @@ private static Double ISASCWithDO(MatrixGame tstgame, int gamenumber, GameReduct
 			
 			OutcomeDistribution origdistribution = new OutcomeDistribution(strategylist);
 			//double[]  originalpayoff = SolverUtils.computeOutcomePayoffs(tstgame, origdistribution);
-			epsilon = SolverUtils.computeOutcomeStability(tstgame, origdistribution);
+			epsilon = SolverUtils.computeOutcomeStability(tstgame, origdistribution);*/
 		}
-		else if(solver==2) //cfr
+		/*else if(solver==2) //cfr
 		{
 			MixedStrategy [] cfrgamestrategy = new MixedStrategy[2];
 			cfrgamestrategy = RegretLearner.solveGame(tstgame);
@@ -4238,7 +4241,7 @@ private static Double ISASCWithDO(MatrixGame tstgame, int gamenumber, GameReduct
 			epsilon = SolverUtils.computeOutcomeStability(tstgame, origdistribution);
 			
 		}
-		
+		*/
 		
 		return epsilon;
 	}
@@ -4290,14 +4293,16 @@ private static Double ISASCWithDO(MatrixGame tstgame, int gamenumber, GameReduct
 	}
 	
 	
-private static MixedStrategy[] solveUsingSimplSub(MatrixGame tstgame, int gamenumber) throws IOException {
+private static void solveUsingLogitQRE(MatrixGame tstgame, int gamenumber) throws IOException {
 		
 		
 		
 		//MixedStrategy[] str = new MixedStrategy[2];
 		
+		
+		
 		Runtime rt = Runtime.getRuntime();
-		Process pr = rt.exec("./lib/gambit-simpdiv " +gamenumber+".nfg");
+		Process pr = rt.exec("./lib/gambit-logit -e " +"./tmp/"+gamenumber+".nfg");
 		//Process pr = rt.exec("./lib/gambit-logit -e "+ gamenumber+".nfg");
 		
 		InputStream is = pr.getInputStream();
@@ -4316,7 +4321,7 @@ private static MixedStrategy[] solveUsingSimplSub(MatrixGame tstgame, int gamenu
         
         String op = out.toString();
         
-        MixedStrategy[] str = parseNE(op, tstgame, gamenumber);
+        //MixedStrategy[] str = parseNE(op, tstgame, gamenumber);
 		
 		
 		
@@ -4326,7 +4331,50 @@ private static MixedStrategy[] solveUsingSimplSub(MatrixGame tstgame, int gamenu
 		 */
 		
 		
-		return str;
+		//return str;
+	}
+	
+	
+	
+private static void solveUsingSimplSub(MatrixGame tstgame, int gamenumber) throws IOException {
+		
+		
+		
+		//MixedStrategy[] str = new MixedStrategy[2];
+		
+		SubNet.writeGamutGame(tstgame, gamenumber);
+	
+		Runtime rt = Runtime.getRuntime();
+		Process pr = rt.exec("./lib/gambit-simpdiv ./tmp/" +gamenumber+".nfg");
+		//Process pr = rt.exec("./lib/gambit-logit -e "+ gamenumber+".nfg");
+		
+		InputStream is = pr.getInputStream();
+		
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder out = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            out.append(line);
+        }
+        System.out.println(out.toString());   //Prints the string content read from input stream
+        reader.close();
+        
+        
+        
+        String op = out.toString();
+        
+       // MixedStrategy[] str = parseNE(op, tstgame, gamenumber);
+		
+		
+		
+		/**
+		 * assume games are already built
+		 * use the gamenumbe.nfg
+		 */
+		
+		
+		//return str;
 	}
 
 

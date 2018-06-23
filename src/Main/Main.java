@@ -740,7 +740,7 @@ public class Main {
 			//GameReductionBySubGame.testSubGameSolverV3();
 			//GameReductionBySubGame.testAllSolvers();
 			
-			int delta = 20;//Integer.parseInt(args[0]);
+			int delta = 0;//Integer.parseInt(args[0]);
 			
 			GameReductionBySubGame.testISASCVSOrigSolvers(delta);
 			
