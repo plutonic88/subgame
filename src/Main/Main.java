@@ -740,9 +740,30 @@ public class Main {
 			//GameReductionBySubGame.testSubGameSolverV3();
 			//GameReductionBySubGame.testAllSolvers();
 			
-			int delta = 0;//Integer.parseInt(args[0]);
 			
-			GameReductionBySubGame.testISASCVSOrigSolvers(delta);
+			
+			//GameReductionBySubGame.testISASCVSOrigSolvers(delta);
+			
+			int delta = 30;//Integer.parseInt(args[0]);
+			
+			GameReductionBySubGame.testISASCSolver(delta);
+			
+			int subgamesolver = 0; // 0 psne, 1 qre
+			int hiersolver = 0; // 0 psne, 1 qre, 2 meb
+			GameReductionBySubGame.testSASCVSOrigSolvers(delta, subgamesolver, hiersolver);
+			
+			
+			subgamesolver = 1; // 0 psne, 1 qre
+			hiersolver = 1; // 0 psne, 1 qre, 2 meb
+			GameReductionBySubGame.testSASCVSOrigSolvers(delta, subgamesolver, hiersolver);
+			
+			
+			subgamesolver = 1; // 0 psne, 1 qre
+			hiersolver = 2; // 0 psne, 1 qre, 2 meb
+			GameReductionBySubGame.testSASCVSOrigSolvers(delta, subgamesolver, hiersolver);
+			
+			
+			
 			
 			// use logitqre
 			//GameReductionBySubGame.testOrigGameSolversNFG();

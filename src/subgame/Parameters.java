@@ -9,21 +9,26 @@ public class Parameters {
   //public static final String GAME_FILES_PATH = "/home/ckiekint/IdeaProjects/EmpiricalGameAnalysis/game_files/";
   //public static final String GAME_FILES_PATH = "C:\\Users\\Oscar-XPS\\Documents\\game\\game_files\\";
   public static final String GAME_FILES_PATH = "/Users/anjonsunny/eclipse-workspace/subgame/";
+  //public static final String GAME_FILES_PATH = "/usr/local/sunny/subgame/";
     //public static final String GAME_FILES_PATH = "";
 
   // base path to the directory where results should be stored
   //public static final String RESULTS_PATH = "/home/ckiekint/IdeaProjects/EmpiricalGameAnalysis/results/";
   //public static final String RESULTS_PATH = "C:\\Users\\Oscar-XPS\\Documents\\game\\results\\";
   public static final String RESULTS_PATH = "/Users/anjonsunny/eclipse-workspace/subgame/";
+ // public static final String RESULTS_PATH = "/usr/local/sunny/subgame/";
 
   // path to the gamut jar file
   //public static final String GAMUT_PATH = "/home/ckiekint/projects/gamut/gamut.jar";
   //public static final String GAMUT_PATH = "C:\\Program Files\\Gamut\\gamut.jar";
   public static final String GAMUT_PATH = "/Users/anjonsunny/eclipse-workspace/subgame/lib/gamut.jar";
+  //public static final String GAMUT_PATH = "/usr/local/sunny/subgame/lib/gamut.jar";
 
   //path to gambit
   //public static final String GAMBIT_LOGIT_PATH = "C:\\Program Files (x86)\\gambit\\gambit-logit";
-  public static final String GAMBIT_LOGIT_PATH = "/Users/anjonsunny/eclipse-workspace/subgame/lib/gambit-logit";
+ public static final String GAMBIT_LOGIT_PATH = "/Users/anjonsunny/eclipse-workspace/subgame/lib/gambit-logit";
+  
+  //public static final String GAMBIT_LOGIT_PATH = "/usr/local/sunny/subgame/lib/gambit-logit";
 
   // file extension for gamut games
   public static final String GAMUT_GAME_EXTENSION = ".gamut";
